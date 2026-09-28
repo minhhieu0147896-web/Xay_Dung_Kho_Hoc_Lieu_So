@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import HomePage from "./home-page";
+import DemoLogin from "./demo-login";
 import {
   initialLessons,
   type Lesson,
@@ -49,6 +50,7 @@ function Icon({ name, size = 20 }: { name: string; size?: number }) {
   );
 }
 export default function LearningApp() {
+  const [signedIn, setSignedIn] = useState(false);
   const [readerMode, setReaderMode] = useState<"read" | "ask" | "quiz">("read");
   const [ready, setReady] = useState(false);
   const [view, setView] = useState<View>("home");
@@ -254,6 +256,12 @@ export default function LearningApp() {
     setLarge(prefs.large);
     setContrast(prefs.contrast);
     persist(`suhoc-prefs-v1-${userId}`, prefs);
+  }
+  if (!signedIn) {
+    return <DemoLogin onLogin={() => {
+      setSignedIn(true);
+      navigate("home");
+    }} />;
   }
   return (
     <div
