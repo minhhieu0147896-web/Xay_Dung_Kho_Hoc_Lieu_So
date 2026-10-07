@@ -1,0 +1,93 @@
+{
+  "id": "doi-moi",
+  "subject": "Lịch sử",
+  "grade": 12,
+  "title": "Việt Nam trên đường Đổi mới",
+  "summary": "Khám phá hoàn cảnh ra đời, nội dung cơ bản và ý nghĩa của công cuộc Đổi mới từ năm 1986.",
+  "period": "1986",
+  "chapter": "Việt Nam từ năm 1975 đến nay",
+  "minutes": 10,
+  "status": "published",
+  "source": "Văn bản diễn giải do demo biên soạn, không phải nguyên văn sách giáo khoa. Chưa được giáo viên kiểm duyệt; chỉ dùng thử chức năng, không dùng làm tài liệu ôn thi chính thức.",
+  "sections": [
+    {
+      "id": "doi-moi-boi-canh",
+      "heading": "Hoàn cảnh ra đời",
+      "body": "Trước năm 1986, Việt Nam gặp nhiều khó khăn về kinh tế và đời sống. Cơ chế quản lý tập trung, quan liêu, bao cấp bộc lộ hạn chế. Tình hình trong nước và những thay đổi trên thế giới đặt ra yêu cầu đổi mới. Đại hội đại biểu toàn quốc lần thứ VI của Đảng Cộng sản Việt Nam, tháng 12 năm 1986, đề ra đường lối Đổi mới.",
+      "blocks": [
+        {
+          "id": "doi-moi-boi-canh-p1",
+          "type": "paragraph",
+          "text": "Trước năm 1986, Việt Nam gặp nhiều khó khăn về kinh tế và đời sống. Cơ chế quản lý tập trung, quan liêu, bao cấp bộc lộ hạn chế. Tình hình trong nước và những thay đổi trên thế giới đặt ra yêu cầu đổi mới. Đại hội đại biểu toàn quốc lần thứ VI của Đảng Cộng sản Việt Nam, tháng 12 năm 1986, đề ra đường lối Đổi mới."
+        }
+      ]
+    },
+    {
+      "id": "doi-moi-noi-dung",
+      "heading": "Nội dung cơ bản của Đổi mới",
+      "body": "Đổi mới được tiến hành toàn diện, trong đó đổi mới kinh tế là trọng tâm. Việt Nam từng bước chuyển từ cơ chế quản lý tập trung, quan liêu, bao cấp sang phát triển nền kinh tế hàng hóa nhiều thành phần vận hành theo cơ chế thị trường có sự quản lý của Nhà nước. Quá trình đổi mới đồng thời gắn với mở rộng quan hệ đối ngoại và hội nhập quốc tế.",
+      "blocks": [
+        {
+          "id": "doi-moi-noi-dung-p1",
+          "type": "paragraph",
+          "text": "Đổi mới được tiến hành toàn diện, trong đó đổi mới kinh tế là trọng tâm. Việt Nam từng bước chuyển từ cơ chế quản lý tập trung, quan liêu, bao cấp sang phát triển nền kinh tế hàng hóa nhiều thành phần vận hành theo cơ chế thị trường có sự quản lý của Nhà nước. Quá trình đổi mới đồng thời gắn với mở rộng quan hệ đối ngoại và hội nhập quốc tế."
+        }
+      ]
+    },
+    {
+      "id": "doi-moi-y-nghia",
+      "heading": "Thành tựu và những vấn đề đặt ra",
+      "body": "Công cuộc Đổi mới góp phần phát triển sản xuất, cải thiện đời sống nhân dân và mở rộng quan hệ quốc tế của Việt Nam. Quá trình phát triển cũng đặt ra những vấn đề như chênh lệch thu nhập, bảo vệ môi trường và nâng cao chất lượng tăng trưởng. Khi đánh giá Đổi mới, cần xem xét cả thành tựu và những hạn chế trong từng giai đoạn cụ thể.",
+      "blocks": [
+        {
+          "id": "doi-moi-y-nghia-p1",
+          "type": "paragraph",
+          "text": "Công cuộc Đổi mới góp phần phát triển sản xuất, cải thiện đời sống nhân dân và mở rộng quan hệ quốc tế của Việt Nam. Quá trình phát triển cũng đặt ra những vấn đề như chênh lệch thu nhập, bảo vệ môi trường và nâng cao chất lượng tăng trưởng. Khi đánh giá Đổi mới, cần xem xét cả thành tựu và những hạn chế trong từng giai đoạn cụ thể."
+        }
+      ]
+    }
+  ],
+  "questions": [
+    {
+      "id": "b1",
+      "prompt": "Đại hội nào đề ra đường lối Đổi mới?",
+      "options": [
+        "Đại hội IV",
+        "Đại hội VI",
+        "Đại hội VIII"
+      ],
+      "correctOptionId": 1,
+      "explanation": "Đại hội VI, tháng 12 năm 1986, đề ra đường lối Đổi mới.",
+      "sourceSectionId": "doi-moi-boi-canh"
+    },
+    {
+      "id": "b2",
+      "prompt": "Lĩnh vực nào là trọng tâm của Đổi mới?",
+      "options": [
+        "Kinh tế",
+        "Thể thao",
+        "Du lịch"
+      ],
+      "correctOptionId": 0,
+      "explanation": "Đổi mới được tiến hành toàn diện, trong đó đổi mới kinh tế là trọng tâm.",
+      "sourceSectionId": "doi-moi-noi-dung"
+    },
+    {
+      "id": "b3",
+      "prompt": "Cách đánh giá nào phù hợp với công cuộc Đổi mới?",
+      "options": [
+        "Chỉ nhìn vào thành tựu",
+        "Bỏ qua bối cảnh từng giai đoạn",
+        "Xem xét cả thành tựu và hạn chế"
+      ],
+      "correctOptionId": 2,
+      "explanation": "Cần đánh giá cả thành tựu và hạn chế trong từng giai đoạn cụ thể.",
+      "sourceSectionId": "doi-moi-y-nghia"
+    }
+  ],
+  "provenance": {
+    "kind": "demo",
+    "title": "Học liệu mẫu của dự án",
+    "edition": "demo-v1"
+  }
+}

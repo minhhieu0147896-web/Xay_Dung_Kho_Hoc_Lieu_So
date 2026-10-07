@@ -37,3 +37,15 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 - `AGENTS.md_GUIDE.pdf` là tài liệu tham khảo về cách tổ chức công việc. Không sao chép nguyên stack hoặc tự áp dụng mọi quy trình phê duyệt của ví dụ vào dự án này. Yêu cầu trực tiếp mới nhất của người dùng quyết định phạm vi hành động.
 - Chỉ báo kiểm tra thành công sau khi thực sự chạy. Lint, typecheck và build không chứng minh UI dễ dùng: phải xem giao diện, thử các luồng chính, màn hình nhỏ và bàn phím; đánh giá tiếp cận với công cụ/người dùng phù hợp trước khi tuyên bố đạt chuẩn.
 - Khi tích hợp backend/AI thật, giữ khóa bí mật và xử lý nhạy cảm phía máy chủ; không coi tài khoản mẫu hoặc localStorage trong demo là xác thực/phân quyền thật.
+
+### Cập nhật 02/10/2026: học theo sách giáo khoa
+
+- Người dùng yêu cầu triển khai bằng mã trong dự án; bắt đầu lớp 12, bộ Kết nối tri thức với cuộc sống. Ưu tiên Lịch sử hiện có, cho phép chọn môn; môn chưa có học liệu phải hiện trạng thái trống.
+- Giao diện nền trắng, điều hướng chính phía trên, chọn môn/lớp/sách; bài học có mục lục bên trái, nội dung ở giữa, lựa chọn YouTube / bài giảng giấy / tương tác AI bên phải. Hạn chế khung thẻ lồng nhau.
+- Mục lục và số bài phải theo đúng bộ sách. Không coi việc có mục lục là đã nhập nội dung SGK. Nội dung demo, video tham khảo và AI chưa kết nối phải ghi đúng trạng thái; giữ dữ liệu người dùng khi nâng cấp.
+
+### Cập nhật 07/10/2026: biên tập học liệu có cấu trúc
+
+- Người dùng đã đồng ý triển khai luồng nhập → bản nháp → xem trước/kiểm tra → công bố, chuẩn bị cho người học mù/khiếm thị. Cách dùng và giới hạn ở `docs/content-authoring.md`.
+- Nội dung khởi tạo nằm trong `content/`; các khối có ID ổn định, nguồn/trang in, mô tả hình, cấu trúc bảng và bản chép lời. Không suy đoán trang in từ số trang PDF; không tự gắn nhãn SGK cho văn bản trích xuất chưa đối chiếu.
+- Bản nháp tách khỏi bản công bố trong `suhoc-content-v2`; giữ dữ liệu cũ và tiến độ. Công bố vẫn cục bộ, chưa có tài khoản/duyệt/backend dùng chung thật. Route PDF/DOCX khóa trong production cho đến khi có xác thực giáo viên phía máy chủ.

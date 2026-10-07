@@ -1,9 +1,13 @@
 "use client";
-import { useState, type RefObject } from "react";
+import { sectionText } from "../services/content";
+import type { RefObject } from "react";
 import type { Lesson } from "../data/lessons";
 import { normalize, searchLessons } from "../services/learning";
+import { courseLessons, lessonLabel, type Course } from "./course-picker";
+
 type Props = {
   lessons: Lesson[];
+  course: Course;
   ready: boolean;
   query: string;
   onQuery: (value: string) => void;
@@ -12,113 +16,103 @@ type Props = {
 };
 export default function HomePage({
   lessons,
+  course,
   ready,
   query,
   onQuery,
   onOpen,
   headingRef,
 }: Props) {
-  const [subject, setSubject] = useState("");
-  const published = lessons.filter((l) => l.status === "published");
-  const subjects = [...new Set(published.map((l) => l.subject))];
-  const visible = searchLessons(lessons, query).filter(
-    (l) => !subject || l.subject === subject,
-  );
+  const available = courseLessons(lessons, course);
+  const visible = searchLessons(available, query);
+  const chapters = [...new Set(visible.map((l) => l.chapter))];
   return (
     <div className="repository-page">
       <header className="repository-heading">
+        <p className="eyebrow">KHO HỌC LIỆU</p>
         <h1 ref={headingRef} tabIndex={-1}>
-          Kho học liệu
+          {course.subject} {course.grade}
         </h1>
-        <p>Tra cứu và đọc tài liệu theo môn học.</p>
+        <p>Chọn bài học, sau đó chọn cách học phù hợp với bạn.</p>
       </header>
-      <section aria-label="Tra cứu học liệu" className="repository-search">
-        <label>
-          Môn học
-          <select value={subject} onChange={(e) => setSubject(e.target.value)}>
-            <option value="">Tất cả môn học</option>
-            {subjects.map((s) => (
-              <option value={s} key={s}>
-                {s}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className="repository-query">
-          Tìm kiếm
-          <input
-            type="search"
-            value={query}
-            onChange={(e) => onQuery(e.target.value)}
-            placeholder="Nhập tên tài liệu hoặc nội dung cần tìm"
-          />
-        </label>
-      </section>
+      <label className="lesson-search">
+        Tìm trong môn học
+        <input
+          type="search"
+          value={query}
+          onChange={(e) => onQuery(e.target.value)}
+          placeholder="Tìm tên bài hoặc nội dung…"
+        />
+      </label>
       <div className="repository-list-heading">
-        <h2>{subject || "Tất cả học liệu"}</h2>
+        <h2>Mục lục bài học</h2>
         <span role="status">
-          {ready ? visible.length + " tài liệu" : "Đang tải…"}
+          {ready ? `${visible.length} bài học` : "Đang tải…"}
         </span>
       </div>
-      {ready && (
-        <div className="repository-list">
-          {visible.map((l) => {
-            const matched = query.trim()
-              ? l.sections.find((s) =>
-                  normalize(s.heading + " " + s.body).includes(
-                    normalize(query.trim()),
-                  ),
-                )
-              : undefined;
-            return (
-              <article className="repository-item" key={l.id}>
-                <div className="document-mark" aria-hidden="true">
-                  <svg
-                    width="27"
-                    height="32"
-                    viewBox="0 0 27 32"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1.4"
-                  >
-                    <path d="M4 2h13l6 6v22H4zM17 2v7h6M8 15h11M8 20h11M8 25h7" />
-                  </svg>
-                </div>
-                <div>
-                  <p className="document-subject">
-                    {l.subject} · Lớp {l.grade}
-                  </p>
-                  <h3>
-                    <button onClick={() => onOpen(l, matched?.id)}>
-                      {l.title}
-                    </button>
-                  </h3>
-                  <p className="document-summary">{l.summary}</p>
-                  <p className="document-details">
-                    {l.sections.length} mục nội dung · {l.questions.length} câu
-                    luyện tập
-                  </p>
-                  {matched && (
-                    <p className="document-match">
-                      Nội dung tìm thấy: {matched.heading}
-                    </p>
-                  )}
-                </div>
-                <span className="document-type">Bài đọc</span>
-              </article>
-            );
-          })}
-        </div>
-      )}
+      {ready &&
+        chapters.map((chapter) => (
+          <section className="chapter-group" key={chapter}>
+            <h3>{chapter}</h3>
+            <ol className="lesson-list">
+              {visible
+                .filter((l) => l.chapter === chapter)
+                .map((l) => {
+                  const matched = query.trim()
+                    ? l.sections.find((s) =>
+                        normalize(s.heading + " " + sectionText(s)).includes(
+                          normalize(query.trim()),
+                        ),
+                      )
+                    : undefined;
+                  return (
+                    <li key={l.id}>
+                      <button
+                        className="lesson-row"
+                        onClick={() => onOpen(l, matched?.id)}
+                      >
+                        <span>
+                          <strong>{lessonLabel(l)}</strong>
+                          <small>
+                            {matched
+                              ? `Tìm thấy trong: ${matched.heading}`
+                              : l.sections.length
+                                ? l.provenance?.kind === "demo" || !l.provenance
+                                  ? "Có bài đọc mẫu"
+                                  : "Có bài đọc"
+                                : "Chưa có bản đọc trong ứng dụng"}
+                          </small>
+                        </span>
+                        <span aria-hidden="true">→</span>
+                      </button>
+                    </li>
+                  );
+                })}
+            </ol>
+          </section>
+        ))}
       {ready && !visible.length && (
-        <div className="repository-empty">
-          <h3>Không có tài liệu phù hợp</h3>
-          <p>Thử thay đổi môn học hoặc nội dung tìm kiếm.</p>
+        <div className="repository-empty" role="status">
+          <h3>
+            {available.length
+              ? "Không tìm thấy bài học"
+              : "Chưa có học liệu cho môn này"}
+          </h3>
+          <p>
+            {available.length
+              ? "Thử một từ khóa khác hoặc xóa nội dung tìm kiếm."
+              : "Chọn môn Lịch sử để xem mục lục lớp 12, bộ Kết nối tri thức."}
+          </p>
+          {query && (
+            <button className="inline-link" onClick={() => onQuery("")}>
+              Xóa tìm kiếm
+            </button>
+          )}
         </div>
       )}
       <p className="repository-note">
-        Bản demo hiện có học liệu môn Lịch sử lớp 12. Các môn khác sẽ xuất hiện
-        khi có tài liệu được công bố.
+        Mục lục theo sách Kết nối tri thức. Nguồn và loại nội dung được ghi
+        trong từng bài; dữ liệu mẫu không phải nguyên văn sách giáo khoa.
       </p>
     </div>
   );

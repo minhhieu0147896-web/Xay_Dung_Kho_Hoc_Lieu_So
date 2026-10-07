@@ -1315,20 +1315,60 @@ h1 {
 }
 
 /* Shared white surfaces and clearly identified interactive states. */
-.repository-search { border-radius: 8px; }
-.repository-item:hover, .repository-item:focus-within { border-color: var(--green); }
-.repository-item h3 button { min-height: 44px; }
-.reader-navigation { padding: 5px; border: 1px solid var(--border); border-radius: 8px; background: var(--white); }
-.reader-navigation button[aria-pressed="true"] { background: var(--soft); border-radius: 4px; }
-.nav-item { font-size: 1em; }
-.sidebar-bottom, .document-details, .document-type, .source-note { font-size: 0.875em; }
-.preferences-page .user-picker select { font-size: 1em; }
-.secondary, .utility { border-color: var(--border); }
-.quiz-option:focus-within { outline: 3px solid #175cd3; outline-offset: 3px; }
-.reading-section, .repository-item, .answer { overflow-wrap: anywhere; }
+.repository-search {
+  border-radius: 8px;
+}
+.repository-item:hover,
+.repository-item:focus-within {
+  border-color: var(--green);
+}
+.repository-item h3 button {
+  min-height: 44px;
+}
+.reader-navigation {
+  padding: 5px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--white);
+}
+.reader-navigation button[aria-pressed="true"] {
+  background: var(--soft);
+  border-radius: 4px;
+}
+.nav-item {
+  font-size: 1em;
+}
+.sidebar-bottom,
+.document-details,
+.document-type,
+.source-note {
+  font-size: 0.875em;
+}
+.preferences-page .user-picker select {
+  font-size: 1em;
+}
+.secondary,
+.utility {
+  border-color: var(--border);
+}
+.quiz-option:focus-within {
+  outline: 3px solid #175cd3;
+  outline-offset: 3px;
+}
+.reading-section,
+.repository-item,
+.answer {
+  overflow-wrap: anywhere;
+}
 @media (max-width: 760px) {
-  .reading-section, .repository-item { padding: 20px; }
-  .nav-item, .large-type .nav-item { font-size: 1em; }
+  .reading-section,
+  .repository-item {
+    padding: 20px;
+  }
+  .nav-item,
+  .large-type .nav-item {
+    font-size: 1em;
+  }
 }
 
 /* Demo entry screen: no credential storage or authentication service. */
@@ -1350,18 +1390,787 @@ h1 {
   border: 1px solid var(--border);
   border-radius: 12px;
 }
-.login-brand { color: var(--green); font-weight: 700; margin-bottom: 24px; }
-.login-intro, .login-footnote { color: var(--muted); }
-.login-demo { background: var(--soft); padding: 16px; border-radius: 6px; margin: 24px 0; font-size: 0.875em; }
-.login-card label { display: block; font-weight: 600; margin: 18px 0 8px; }
-.login-card input { width: 100%; min-width: 0; min-height: 48px; padding: 12px; border: 1px solid #8595a5; border-radius: 6px; background: #fff; color: var(--ink); }
-.login-password { display: flex; gap: 8px; align-items: stretch; }
-.login-password input { flex: 1; }
-.login-password button { flex-shrink: 0; font-size: 0.875em; padding: 8px; }
-.login-submit { width: 100%; margin-top: 28px; }
-.login-footnote { margin-top: 24px; font-size: 0.875em; }
+.login-brand {
+  color: var(--green);
+  font-weight: 700;
+  margin-bottom: 24px;
+}
+.login-intro,
+.login-footnote {
+  color: var(--muted);
+}
+.login-demo {
+  background: var(--soft);
+  padding: 16px;
+  border-radius: 6px;
+  margin: 24px 0;
+  font-size: 0.875em;
+}
+.login-card label {
+  display: block;
+  font-weight: 600;
+  margin: 18px 0 8px;
+}
+.login-card input {
+  width: 100%;
+  min-width: 0;
+  min-height: 48px;
+  padding: 12px;
+  border: 1px solid #8595a5;
+  border-radius: 6px;
+  background: #fff;
+  color: var(--ink);
+}
+.login-password {
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+}
+.login-password input {
+  flex: 1;
+}
+.login-password button {
+  flex-shrink: 0;
+  font-size: 0.875em;
+  padding: 8px;
+}
+.login-submit {
+  width: 100%;
+  margin-top: 28px;
+}
+.login-footnote {
+  margin-top: 24px;
+  font-size: 0.875em;
+}
 @media (max-width: 480px) {
-  .login-card { padding: 24px 20px; }
-  .login-password { flex-wrap: wrap; }
-  .login-password input { flex-basis: 100%; }
+  .login-card {
+    padding: 24px 20px;
+  }
+  .login-password {
+    flex-wrap: wrap;
+  }
+  .login-password input {
+    flex-basis: 100%;
+  }
+}
+
+/* Textbook workspace: one reading surface, two lightweight navigation columns. */
+.textbook-app {
+  --border: #dce3eb;
+  --green: #245b85;
+  --soft: #eef5fc;
+}
+.textbook-app.high-contrast {
+  --border: #687b8a;
+  --green: #173b54;
+}
+.textbook-app .sidebar,
+.textbook-app.large-type .sidebar {
+  position: static;
+  width: 100%;
+  padding: 18px 36px;
+  overflow: visible;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 48px;
+  border-right: 0;
+  border-bottom: 1px solid var(--border);
+}
+.textbook-app .brand {
+  flex-shrink: 0;
+}
+.textbook-app .brand-sub,
+.textbook-app .workspace-label,
+.textbook-app .sidebar-bottom {
+  display: none;
+}
+.textbook-app .sidebar nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 0;
+}
+.textbook-app .nav-item {
+  width: auto;
+  margin: 0;
+  padding: 10px 12px;
+  border-left: 0;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+}
+.textbook-app .nav-item.active {
+  background: transparent;
+  border-bottom-color: var(--green);
+}
+.textbook-app .main-shell,
+.textbook-app.large-type .main-shell {
+  margin: 0;
+}
+.textbook-app main {
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 40px;
+}
+.textbook-app main.reader-main {
+  max-width: none;
+  padding: 0;
+}
+.course-picker {
+  display: grid;
+  grid-template-columns: 1fr 0.65fr 1.5fr;
+  gap: 32px;
+  padding: 22px 36px;
+  border-bottom: 1px solid var(--border);
+}
+.course-picker label,
+.lesson-search {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 0.9375em;
+  min-width: 0;
+}
+.course-picker select,
+.lesson-search input {
+  width: 100%;
+  min-width: 0;
+  padding: 12px 14px;
+  min-height: 48px;
+  border: 1px solid #aebfce;
+  border-radius: 5px;
+  background: var(--white);
+  color: var(--ink);
+}
+.repository-page {
+  max-width: 1020px;
+  margin: auto;
+}
+.repository-heading .eyebrow {
+  margin-bottom: 8px;
+}
+.lesson-search {
+  margin: 0 0 32px;
+  max-width: 680px;
+}
+.chapter-group {
+  margin-top: 28px;
+}
+.chapter-group > h3 {
+  font-size: 1em;
+  font-weight: 600;
+  color: var(--muted);
+  padding-bottom: 10px;
+  line-height: 1.6;
+}
+.lesson-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.lesson-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+  width: 100%;
+  text-align: left;
+  color: var(--ink);
+  background: transparent;
+  border-bottom: 1px solid var(--border);
+  padding: 18px 8px;
+}
+.lesson-row:hover {
+  background: var(--soft);
+}
+.lesson-row strong {
+  font-size: 1.0625em;
+  font-weight: 500;
+}
+.lesson-row small {
+  display: block;
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 0.875em;
+}
+.lesson-row > span:last-child {
+  color: var(--green);
+}
+.textbook-layout {
+  display: grid;
+  grid-template-columns: 265px minmax(0, 1fr) 280px;
+  max-width: 1680px;
+  margin: auto;
+  align-items: start;
+}
+.book-outline {
+  padding: 28px 20px;
+  border-right: 1px solid var(--border);
+  min-height: 70vh;
+}
+.book-outline h2,
+.learning-options h2 {
+  font-size: 1.125em;
+  margin: 20px 0 8px;
+}
+.outline-caption {
+  color: var(--muted);
+  font-size: 0.8125em;
+  margin-bottom: 22px;
+}
+.book-outline details {
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+.book-outline summary {
+  cursor: pointer;
+  color: var(--muted);
+  line-height: 1.65;
+  font-size: 0.875em;
+  padding: 6px 0;
+}
+.book-outline summary:focus-visible {
+  outline: 3px solid #175cd3;
+  outline-offset: 3px;
+}
+.outline-lesson {
+  display: block;
+  width: 100%;
+  text-align: left;
+  color: var(--ink);
+  background: transparent;
+  padding: 12px;
+  margin: 4px 0;
+  border-left: 3px solid transparent;
+  font-size: 0.875em;
+  line-height: 1.65;
+}
+.outline-lesson[aria-current="page"] {
+  background: var(--soft);
+  color: var(--green);
+  border-left-color: var(--green);
+  font-weight: 600;
+}
+.textbook-layout > .reading-body {
+  padding: 32px 38px;
+}
+.lesson-heading h1 {
+  font-size: 2em;
+  line-height: 1.35;
+  margin: 12px 0;
+}
+.lesson-heading > p {
+  color: var(--muted);
+  font-size: 0.875em;
+}
+.textbook-app .reader-navigation {
+  border: 0;
+  border-bottom: 1px solid var(--border);
+  padding: 0;
+  margin: 22px 0;
+  border-radius: 0;
+  gap: 20px;
+}
+.textbook-app .reader-navigation button {
+  padding: 14px 6px;
+  font-size: 1em;
+}
+.textbook-app .reader-navigation button[aria-pressed="true"] {
+  background: transparent;
+  border-radius: 0;
+}
+.learning-options {
+  padding: 28px 18px;
+  border-left: 1px solid var(--border);
+}
+.learning-options h2 {
+  margin: 0 0 22px 12px;
+}
+.resource-choice {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 18px 12px;
+  margin: 6px 0;
+  width: 100%;
+  background: transparent;
+  text-align: left;
+  color: var(--ink);
+  border-left: 3px solid transparent;
+  border-radius: 4px;
+}
+.resource-choice svg {
+  flex-shrink: 0;
+  margin-top: 3px;
+}
+.resource-choice strong {
+  font-size: 0.9375em;
+  font-weight: 600;
+}
+.resource-choice small {
+  display: block;
+  font-size: 0.8125em;
+  color: var(--muted);
+  margin-top: 4px;
+}
+.resource-choice[aria-pressed="true"] {
+  background: var(--soft);
+  color: var(--green);
+  border-left-color: var(--green);
+}
+.section-outline {
+  border-top: 1px solid var(--border);
+  margin-top: 28px;
+  padding: 24px 12px 0;
+}
+.section-outline h3 {
+  font-size: 1em;
+  margin-bottom: 12px;
+}
+.section-outline a {
+  display: block;
+  padding: 10px 0;
+  font-size: 0.875em;
+  text-decoration: none;
+}
+.section-outline a:hover {
+  text-decoration: underline;
+}
+.textbook-app .reading-section,
+.textbook-app .ask-panel,
+.textbook-app .quiz-panel {
+  border: 0;
+  border-radius: 0;
+  padding: 12px 0 28px;
+  margin: 0;
+  box-shadow: none;
+}
+.textbook-app .reading-section {
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 24px;
+}
+.textbook-app .reading-section h2 {
+  font-size: 1.375em;
+}
+.textbook-app .reading-section p {
+  line-height: 1.85;
+}
+.textbook-app .audio-bar {
+  border: 0;
+  border-bottom: 1px solid var(--border);
+  border-radius: 0;
+  padding: 4px 0 18px;
+  gap: 10px;
+}
+.textbook-app .audio-bar > div {
+  min-width: 100px;
+}
+.textbook-app .audio-bar strong {
+  display: none;
+}
+.textbook-app .source-note {
+  line-height: 1.7;
+}
+.resource-panel {
+  padding: 20px 0 36px;
+}
+.resource-panel h2 {
+  margin-bottom: 16px;
+}
+.resource-panel p {
+  color: var(--muted);
+  line-height: 1.8;
+  margin-bottom: 24px;
+}
+.resource-panel a.secondary {
+  display: inline-flex;
+  text-decoration: none;
+}
+.lesson-video {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border: 0;
+  margin: 12px 0;
+}
+.lesson-pagination {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 20px;
+  border-top: 1px solid var(--border);
+  padding-top: 24px;
+  margin-top: 24px;
+}
+.textbook-app .page-footer {
+  margin: 0;
+  padding: 24px 36px;
+}
+.textbook-app .large-type,
+.textbook-app.large-type .reading-section p {
+  font-size: 1.25em;
+}
+@media (min-width: 1151px) {
+  .book-outline,
+  .learning-options {
+    position: sticky;
+    top: 0;
+    max-height: 100vh;
+    overflow-y: auto;
+  }
+}
+@media (max-width: 1150px) {
+  .textbook-layout {
+    grid-template-columns: 225px minmax(0, 1fr);
+  }
+  .learning-options {
+    grid-column: 2;
+    grid-row: 1;
+    border-left: 0;
+    border-bottom: 1px solid var(--border);
+    padding: 20px 24px;
+    display: flex;
+    flex-wrap: wrap;
+  }
+  .learning-options h2 {
+    width: 100%;
+    margin: 0 0 8px;
+  }
+  .resource-choice {
+    flex: 1 1 160px;
+    padding: 12px 8px;
+  }
+  .section-outline {
+    display: none;
+  }
+  .book-outline {
+    grid-column: 1;
+    grid-row: 1 / 3;
+  }
+  .textbook-layout > .reading-body {
+    grid-column: 2;
+    grid-row: 2;
+    padding: 28px;
+  }
+  .textbook-app .sidebar {
+    gap: 24px;
+    padding: 18px 24px;
+  }
+}
+@media (max-width: 760px) {
+  .textbook-app .sidebar,
+  .textbook-app.large-type .sidebar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 18px 20px 10px;
+  }
+  .textbook-app .sidebar nav {
+    width: 100%;
+    gap: 4px;
+  }
+  .textbook-app .nav-item {
+    font-size: 0.875em;
+    padding: 10px 6px;
+    min-width: 0;
+  }
+  .textbook-app .nav-item svg {
+    display: none;
+  }
+  .course-picker {
+    grid-template-columns: 1fr 0.7fr;
+    gap: 16px;
+    padding: 20px;
+  }
+  .course-picker label:last-child {
+    grid-column: 1 / -1;
+  }
+  .textbook-app main {
+    padding: 28px 20px;
+  }
+  .textbook-layout {
+    display: flex;
+    flex-direction: column;
+  }
+  .book-outline {
+    width: 100%;
+    min-height: 0;
+    padding: 20px;
+    border-right: 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .book-outline nav {
+    max-height: 240px;
+    overflow-y: auto;
+    padding: 4px;
+  }
+  .book-outline h2 {
+    margin: 12px 0 4px;
+  }
+  .outline-caption {
+    margin-bottom: 8px;
+  }
+  .learning-options {
+    order: 1;
+    width: 100%;
+    padding: 18px 20px;
+  }
+  .resource-choice {
+    flex-basis: 100%;
+    padding: 12px;
+    margin: 0;
+  }
+  .textbook-layout > .reading-body {
+    order: 2;
+    width: 100%;
+    padding: 28px 20px;
+  }
+  .lesson-heading h1 {
+    font-size: 1.75em;
+  }
+  .textbook-app .reader-navigation {
+    gap: 18px;
+    flex-wrap: wrap;
+  }
+  .textbook-app .reader-navigation button {
+    font-size: 0.9375em;
+  }
+  .lesson-pagination .inline-link {
+    min-height: 44px;
+  }
+}
+@media print {
+  .textbook-app .sidebar,
+  .course-picker,
+  .book-outline,
+  .learning-options,
+  .reader-navigation,
+  .audio-bar,
+  .section-actions,
+  .lesson-pagination,
+  .page-footer {
+    display: none !important;
+  }
+  .textbook-layout {
+    display: block;
+  }
+  .textbook-layout > .reading-body {
+    padding: 0;
+  }
+}
+
+/* Authoring shares the same semantic reader as the published lesson. */
+.authoring {
+  max-width: 900px;
+  margin: 0 auto;
+}
+.authoring-toolbar,
+.authoring-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: center;
+  margin-bottom: 22px;
+}
+.authoring-toolbar {
+  justify-content: space-between;
+}
+.authoring-toolbar > span {
+  color: var(--muted);
+  font-size: 0.875em;
+}
+.authoring-tabs button[aria-pressed="true"] {
+  background: var(--soft);
+  border-color: var(--green);
+}
+.authoring-fields {
+  padding: 0;
+  margin: 20px 0;
+  border: 0;
+  min-width: 0;
+}
+.authoring label:not(.check-label) {
+  display: block;
+  margin: 18px 0;
+  font-weight: 500;
+}
+.authoring input:not([type="checkbox"]),
+.authoring select,
+.authoring textarea {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  padding: 11px 12px;
+  margin-top: 7px;
+  color: var(--ink);
+  background: var(--white);
+  border: 1px solid #889bab;
+  border-radius: 4px;
+}
+.authoring textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+.authoring input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+.authoring details {
+  border-block: 1px solid var(--border);
+  padding: 16px 0;
+  margin: 24px 0;
+}
+.authoring summary,
+.video-transcript summary {
+  cursor: pointer;
+  padding: 8px 0;
+  font-weight: 600;
+}
+.authoring summary:focus-visible,
+.content-block summary:focus-visible {
+  outline: 3px solid #175cd3;
+  outline-offset: 4px;
+}
+.source-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+.section-editor {
+  border: 0;
+  border-top: 1px solid var(--border);
+  min-width: 0;
+  padding: 22px 0;
+  margin: 28px 0;
+}
+.section-editor > legend {
+  font-size: 1.2em;
+  font-weight: 600;
+  padding-right: 12px;
+}
+.block-editor {
+  border: 0;
+  border-left: 2px solid var(--border);
+  margin: 26px 0;
+  padding: 4px 0 4px 20px;
+  min-width: 0;
+}
+.block-editor > legend {
+  padding: 0 8px;
+  color: var(--muted);
+}
+.source-document iframe {
+  display: block;
+  width: 100%;
+  height: 500px;
+  margin-top: 16px;
+  border: 1px solid var(--border);
+}
+.authoring-preview {
+  margin-top: 28px;
+}
+.authoring-preview h4 {
+  font-size: 1.25em;
+  margin: 22px 0 14px;
+}
+.publish-check {
+  border-top: 1px solid var(--border);
+  padding-top: 26px;
+  margin-top: 26px;
+}
+.publish-check .check-label {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin: 22px 0;
+}
+.publish-check li {
+  margin: 10px 0;
+}
+.content-block {
+  margin: 20px 0;
+  scroll-margin-top: 30px;
+  overflow-wrap: anywhere;
+}
+.content-block:focus {
+  outline: 3px solid var(--green);
+  outline-offset: 6px;
+}
+.paragraph-text {
+  white-space: pre-line;
+}
+.content-block figure {
+  margin: 0;
+}
+.content-block img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+.content-block figcaption {
+  margin-top: 10px;
+  color: var(--muted);
+}
+.content-block details {
+  margin-top: 14px;
+}
+.content-block summary {
+  cursor: pointer;
+  min-height: 44px;
+}
+.content-block li {
+  margin-bottom: 12px;
+  font-size: 1.125em;
+}
+.content-table {
+  overflow-x: auto;
+  max-width: 100%;
+}
+.content-table table {
+  border-collapse: collapse;
+  width: 100%;
+}
+.content-table caption {
+  text-align: left;
+  margin-bottom: 12px;
+  font-weight: 600;
+}
+.content-table th,
+.content-table td {
+  border: 1px solid var(--border);
+  text-align: left;
+  padding: 12px;
+  min-width: 100px;
+  vertical-align: top;
+}
+.content-table th {
+  background: var(--soft);
+}
+.reading-section .block-source {
+  font-size: 0.8125em;
+  margin-top: 10px;
+  color: var(--muted);
+}
+.video-transcript {
+  margin: 20px 0;
+}
+.authoring p[role="alert"],
+.authoring p[role="status"] {
+  white-space: pre-line;
+}
+@media (max-width: 650px) {
+  .source-fields {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+  }
+  .block-editor {
+    padding-left: 12px;
+  }
+  .authoring input[type="file"] {
+    font-size: 0.875em;
+  }
+  .source-document iframe {
+    height: 350px;
+  }
 }

@@ -14,7 +14,7 @@ Kiểm tra: `npx tsc --noEmit` và `npm run lint`.
 
 ## Chức năng
 
-- Tổng quan, thư viện, tìm kiếm tên và nội dung không phân biệt dấu.
+- Kho học liệu, chọn môn/lớp/sách, tìm kiếm tên và nội dung không phân biệt dấu.
 - Hai bài mẫu, mỗi bài ba mục và ba câu trắc nghiệm.
 - Mục lục, đánh dấu đã đọc, tiếp tục từ mục đã lưu.
 - Hỏi đáp truy hồi từ khóa với đoạn nguồn có thể điều hướng; từ chối khi không đủ khớp. Không có LLM hoặc RAG thật.
@@ -32,7 +32,13 @@ Dữ liệu lưu trong localStorage với tiền tố `suhoc-`; không đồng b
 ## Nội dung và giới hạn
 
 Nội dung diễn giải do demo biên soạn, chưa được giáo viên xác minh, không phải trích nguyên văn sách giáo khoa. Chỉ dùng để kiểm tra tương tác. Trạng thái published mô phỏng hiển thị, không chứng nhận chuyên môn. Giao diện dùng danh sách bài học đơn giản, không dùng hình trang trí.
-Truy hồi dùng ngưỡng khớp từ khóa, có thể bỏ sót hoặc chọn đoạn chưa phù hợp. Không tuyên bố đạt chuẩn tiếp cận; cần kiểm thử NVDA và người dùng thực tế. Không có OCR, STT, backend, xác thực, AI trả phí hoặc tác vụ nhiều agent.
+Truy hồi dùng ngưỡng khớp từ khóa, có thể bỏ sót hoặc chọn đoạn chưa phù hợp. Không tuyên bố đạt chuẩn tiếp cận; cần kiểm thử NVDA và người dùng thực tế. Có route trích xuất PDF/Word cục bộ; chưa có OCR, STT, backend lưu trữ dùng chung, xác thực thật hoặc AI sinh câu trả lời.
+
+## Nhập học liệu có cấu trúc (07/10/2026)
+
+Đã có nhập PDF có chữ, DOCX, TXT và JSON; biên tập đoạn/danh sách/hình/bảng, nguồn/trang, câu hỏi và bản chép lời; lưu nháp riêng, xem trước, kiểm tra rồi công bố trong demo. [Hướng dẫn sử dụng và giới hạn](docs/content-authoring.md).
+
+PDF/DOCX chỉ nhập được khi chạy `npm run dev`; production khóa route nhập vì chưa có xác thực giáo viên thật. Dữ liệu biên tập lưu ở trình duyệt, cần xuất JSON để sao lưu; không tự ghi ngược vào tệp dự án.
 
 ## Kiểm thử thủ công
 
@@ -59,3 +65,15 @@ Sau demo, thay dịch vụ bằng backend xác thực và database tiến độ;
 Menu học sinh gồm Kho học liệu, Học liệu đang học, Cài đặt & tài khoản. Giáo viên và quản trị có thêm mục quản lý phù hợp. Trang kho chỉ có bộ chọn môn, tìm kiếm và tên tài liệu có thể mở; tiến độ và tùy chọn hiển thị ở trang riêng.
 
 Kiểm tra: chọn Lịch sử, tìm Ha Noi và mở tên bài để đến mục nguồn. Tìm từ không có trong dữ liệu để xem trạng thái rỗng. Vào Cài đặt & tài khoản để bật chữ lớn/tương phản và chuyển tài khoản. Vào Học liệu đang học để tiếp tục nội dung đã lưu. Kiểm tra bằng Tab/Enter và chiều rộng 390px.
+
+## Học theo sách giáo khoa (02/10/2026)
+
+Mặc định lớp 12, Kết nối tri thức với cuộc sống. Môn Lịch sử có mục lục 17 bài / 6 chủ đề; các môn khác chọn được nhưng chưa có dữ liệu. Mục lục đối chiếu tại [VietJack](https://vietjack.com/lich-su-12-kn/) và [bản mục lục sách](https://www.sachgiaokhoa.online/lop-12-15/ket-noi-tri-thuc-voi-cuoc-song-3/lich-su-12-3536.html). Chỉ nhập tên bài, không sao chép toàn văn SGK. Hai bài mẫu cũ được gắn vào bài 6 và 10, giữ ID và tiến độ; các bài còn lại có trạng thái chưa nhập nội dung.
+
+Trang bài học dùng ba cột, nền trắng và đường phân cách nhẹ. Chọn YouTube / bài giảng giấy / tương tác AI bên phải. Hai video tham khảo bài 1 và 6 lấy từ liên kết của VietJack; chưa kiểm chứng khả năng phát nhúng trong môi trường này. Video không tự phát, có liên kết mở YouTube. Các bài chưa gắn video có liên kết tìm kiếm theo tên bài. Giáo viên có thể gắn mã video, thêm mục bài đọc và ghi nguồn qua màn hình biên tập demo.
+
+AI chưa kết nối: phần hỏi đáp hiện vẫn tìm đoạn nguồn bằng từ khóa. Chuyển cách học trong cùng bài giữ câu hỏi, câu trả lời và lựa chọn quiz. Chuyển bài dừng giọng đọc, hủy câu hỏi đang xử lý và đặt lại phiên bài. Các bài chưa có câu hỏi không cho nộp quiz rỗng.
+
+Cần cung cấp bản sách/học liệu nguồn để nhập nội dung chính xác. Mục lục không có nghĩa là đã có bản sách trong ứng dụng. Dữ liệu giáo viên sửa và tài khoản vẫn là demo cục bộ.
+
+Kiểm thử dữ liệu: `node --test tests/curriculum.test.mjs` (Node 24). Kiểm thử giao diện cần thêm: chọn môn trống; tìm không dấu; mở bài 6; chuyển ba cách học; hỏi rồi mở nguồn; giữ đáp án khi chuyển mục; bài trước/sau; 390px, 768px, 1440px; Tab/Enter; chữ lớn và tương phản. Công cụ trình duyệt ở phiên triển khai bị lỗi khởi động nên chưa xác nhận các bước UI này.

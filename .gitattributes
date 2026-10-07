@@ -1,0 +1,4 @@
+# Preserve binary fixtures and screenshots without line-ending conversion.
+*.pdf binary
+*.docx binary
+*.jpg binary

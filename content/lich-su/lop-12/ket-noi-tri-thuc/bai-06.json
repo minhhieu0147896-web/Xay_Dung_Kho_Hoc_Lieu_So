@@ -1,0 +1,93 @@
+{
+  "id": "cach-mang-thang-tam",
+  "subject": "Lịch sử",
+  "grade": 12,
+  "title": "Cách mạng tháng Tám năm 1945",
+  "summary": "Tìm hiểu bối cảnh, diễn biến và ý nghĩa của bước ngoặt mở ra một thời kỳ mới trong lịch sử Việt Nam.",
+  "period": "1945",
+  "chapter": "Việt Nam từ năm 1919 đến năm 1945",
+  "minutes": 12,
+  "status": "published",
+  "source": "Văn bản diễn giải do demo biên soạn, không phải nguyên văn sách giáo khoa. Chưa được giáo viên kiểm duyệt; chỉ dùng thử chức năng, không dùng làm tài liệu ôn thi chính thức.",
+  "sections": [
+    {
+      "id": "thang-tam-boi-canh",
+      "heading": "Bối cảnh lịch sử và thời cơ",
+      "body": "Tháng 8 năm 1945, Nhật Bản đầu hàng Đồng minh. Chính quyền thân Nhật ở Đông Dương lâm vào khủng hoảng. Trong nước, lực lượng cách mạng đã được chuẩn bị qua quá trình đấu tranh. Sự kết hợp giữa điều kiện quốc tế và sự chuẩn bị trong nước tạo thời cơ để nhân dân Việt Nam tiến hành tổng khởi nghĩa giành chính quyền.",
+      "blocks": [
+        {
+          "id": "thang-tam-boi-canh-p1",
+          "type": "paragraph",
+          "text": "Tháng 8 năm 1945, Nhật Bản đầu hàng Đồng minh. Chính quyền thân Nhật ở Đông Dương lâm vào khủng hoảng. Trong nước, lực lượng cách mạng đã được chuẩn bị qua quá trình đấu tranh. Sự kết hợp giữa điều kiện quốc tế và sự chuẩn bị trong nước tạo thời cơ để nhân dân Việt Nam tiến hành tổng khởi nghĩa giành chính quyền."
+        }
+      ]
+    },
+    {
+      "id": "thang-tam-dien-bien",
+      "heading": "Những mốc chính của tổng khởi nghĩa",
+      "body": "Trong tháng 8 năm 1945, phong trào giành chính quyền diễn ra ở nhiều địa phương. Hà Nội giành chính quyền ngày 19 tháng 8, Huế ngày 23 tháng 8 và Sài Gòn ngày 25 tháng 8. Ngày 2 tháng 9 năm 1945, tại Quảng trường Ba Đình ở Hà Nội, Chủ tịch Hồ Chí Minh đọc Tuyên ngôn Độc lập, tuyên bố thành lập nước Việt Nam Dân chủ Cộng hòa.",
+      "blocks": [
+        {
+          "id": "thang-tam-dien-bien-p1",
+          "type": "paragraph",
+          "text": "Trong tháng 8 năm 1945, phong trào giành chính quyền diễn ra ở nhiều địa phương. Hà Nội giành chính quyền ngày 19 tháng 8, Huế ngày 23 tháng 8 và Sài Gòn ngày 25 tháng 8. Ngày 2 tháng 9 năm 1945, tại Quảng trường Ba Đình ở Hà Nội, Chủ tịch Hồ Chí Minh đọc Tuyên ngôn Độc lập, tuyên bố thành lập nước Việt Nam Dân chủ Cộng hòa."
+        }
+      ]
+    },
+    {
+      "id": "thang-tam-y-nghia",
+      "heading": "Ý nghĩa lịch sử",
+      "body": "Cách mạng tháng Tám năm 1945 lật đổ chế độ quân chủ và chính quyền thống trị thực dân, phát xít ở Việt Nam, đưa nhân dân trở thành người làm chủ đất nước. Sự ra đời của nước Việt Nam Dân chủ Cộng hòa mở ra thời kỳ độc lập dân tộc. Thắng lợi thể hiện vai trò của sự chuẩn bị lực lượng, đoàn kết toàn dân và việc nắm bắt thời cơ.",
+      "blocks": [
+        {
+          "id": "thang-tam-y-nghia-p1",
+          "type": "paragraph",
+          "text": "Cách mạng tháng Tám năm 1945 lật đổ chế độ quân chủ và chính quyền thống trị thực dân, phát xít ở Việt Nam, đưa nhân dân trở thành người làm chủ đất nước. Sự ra đời của nước Việt Nam Dân chủ Cộng hòa mở ra thời kỳ độc lập dân tộc. Thắng lợi thể hiện vai trò của sự chuẩn bị lực lượng, đoàn kết toàn dân và việc nắm bắt thời cơ."
+        }
+      ]
+    }
+  ],
+  "questions": [
+    {
+      "id": "a1",
+      "prompt": "Sự kiện quốc tế nào tạo thời cơ cho tổng khởi nghĩa tháng 8 năm 1945?",
+      "options": [
+        "Nhật Bản đầu hàng Đồng minh",
+        "Liên minh châu Âu thành lập",
+        "Chiến tranh lạnh kết thúc"
+      ],
+      "correctOptionId": 0,
+      "explanation": "Nhật Bản đầu hàng Đồng minh khiến chính quyền thân Nhật ở Đông Dương khủng hoảng.",
+      "sourceSectionId": "thang-tam-boi-canh"
+    },
+    {
+      "id": "a2",
+      "prompt": "Hà Nội giành chính quyền vào ngày nào?",
+      "options": [
+        "2 tháng 9 năm 1945",
+        "19 tháng 8 năm 1945",
+        "25 tháng 8 năm 1945"
+      ],
+      "correctOptionId": 1,
+      "explanation": "Hà Nội giành chính quyền ngày 19 tháng 8; Huế ngày 23 tháng 8 và Sài Gòn ngày 25 tháng 8.",
+      "sourceSectionId": "thang-tam-dien-bien"
+    },
+    {
+      "id": "a3",
+      "prompt": "Ý nghĩa nào gắn với Cách mạng tháng Tám?",
+      "options": [
+        "Thành lập ASEAN",
+        "Kết thúc Chiến tranh lạnh",
+        "Đưa nhân dân trở thành người làm chủ đất nước"
+      ],
+      "correctOptionId": 2,
+      "explanation": "Thắng lợi đưa nhân dân trở thành người làm chủ đất nước, mở ra thời kỳ độc lập dân tộc.",
+      "sourceSectionId": "thang-tam-y-nghia"
+    }
+  ],
+  "provenance": {
+    "kind": "demo",
+    "title": "Học liệu mẫu của dự án",
+    "edition": "demo-v1"
+  }
+}

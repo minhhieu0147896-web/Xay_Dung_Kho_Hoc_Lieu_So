@@ -1,3 +1,4 @@
+import { blocksOf, blockText, sectionText } from "./content.ts";
 import type { Answer, Lesson } from "../data/lessons";
 export function normalize(value: string) {
   return value
@@ -18,7 +19,7 @@ export function searchLessons(lessons: Lesson[], query: string) {
             " " +
             l.summary +
             " " +
-            l.sections.map((s) => s.heading + " " + s.body).join(" "),
+            l.sections.map((s) => s.heading + " " + sectionText(s)).join(" "),
         ).includes(term),
     );
 }
@@ -47,25 +48,33 @@ export function askLesson(lesson: Lesson, question: string): Answer {
     "mot",
     "the",
     "thu",
+    "bao",
+    "nhieu",
   ]);
   const tokens = [
     ...new Set(normalize(question).match(/[a-z0-9]+/g) ?? []),
   ].filter((t) => !stop.has(t) && t.length > 1);
   const ranked = lesson.sections
-    .map((section) => ({
-      section,
-      score: tokens.filter((t) =>
-        normalize(
-          section.heading + " " + section.body + " " +
-          lesson.questions
-            .filter((question) => question.sourceSectionId === section.id)
-            .map((question) => question.prompt)
-            .join(" "),
-        )
-          .split(/\W+/)
-          .includes(t),
-      ).length,
-    }))
+    .flatMap((section) =>
+      blocksOf(section).map((block) => ({
+        section,
+        block,
+        score: tokens.filter((token) =>
+          normalize(
+            section.heading +
+              " " +
+              blockText(block) +
+              " " +
+              lesson.questions
+                .filter((q) => q.sourceSectionId === section.id)
+                .map((q) => q.prompt)
+                .join(" "),
+          )
+            .split(/\W+/)
+            .includes(token),
+        ).length,
+      })),
+    )
     .sort((a, b) => b.score - a.score);
   const match = ranked[0];
   if (
@@ -80,12 +89,14 @@ export function askLesson(lesson: Lesson, question: string): Answer {
       status: "insufficient_evidence",
     };
   return {
-    text: match.section.body,
+    text: blockText(match.block),
     citations: [
       {
         lessonId: lesson.id,
         sectionId: match.section.id,
-        excerpt: match.section.body,
+        blockId: match.block.id,
+        page: match.block.page,
+        excerpt: blockText(match.block),
       },
     ],
     mode: "retrieval",
