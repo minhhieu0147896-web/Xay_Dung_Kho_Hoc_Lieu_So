@@ -49,3 +49,16 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 - Người dùng đã đồng ý triển khai luồng nhập → bản nháp → xem trước/kiểm tra → công bố, chuẩn bị cho người học mù/khiếm thị. Cách dùng và giới hạn ở `docs/content-authoring.md`.
 - Nội dung khởi tạo nằm trong `content/`; các khối có ID ổn định, nguồn/trang in, mô tả hình, cấu trúc bảng và bản chép lời. Không suy đoán trang in từ số trang PDF; không tự gắn nhãn SGK cho văn bản trích xuất chưa đối chiếu.
 - Bản nháp tách khỏi bản công bố trong `suhoc-content-v2`; giữ dữ liệu cũ và tiến độ. Công bố vẫn cục bộ, chưa có tài khoản/duyệt/backend dùng chung thật. Route PDF/DOCX khóa trong production cho đến khi có xác thực giáo viên phía máy chủ.
+
+### Tài liệu kiến trúc và kế hoạch (07/10/2026)
+
+- Theo yêu cầu người dùng, thiết kế hệ thống nằm ở `docs/system-design.md`, kế hoạch và tiêu chí nghiệm thu ở `docs/implementation-plan.md`. Đọc trước khi triển khai backend.
+- Phương án thiết kế là Next.js + Supabase PostgreSQL/Auth/Storage và worker nhập tài liệu, giữ phiên bản công bố bất biến và nguồn tới từng khối. Đây là kiến trúc mục tiêu, chưa phải backend đã triển khai; không biến giả định/ngưỡng nghiệm thu trong tài liệu thành kết quả đã kiểm chứng.
+
+### Cập nhật 08/10/2026: sửa các điểm khó dùng sau đánh giá giao diện
+
+- Người dùng đồng ý sửa các điểm đã đánh giá. Đọc bài / Hỏi đáp / Luyện tập là điều hướng hoạt động duy nhất; cột phải chứa video bổ sung và mục lục trong bài, không lặp lại lựa chọn đọc/AI. Thay nhãn “bài giảng giấy” bằng bài đọc; không mô tả hỏi đáp từ khóa là AI thật.
+- Kho mặc định lọc bài có bản đọc, có lựa chọn toàn bộ mục lục. Tìm được số bài chính xác; phân biệt bài đọc mẫu, chỉ có video, và chưa nhập nội dung. Giữ bộ lọc và câu tìm kiếm khi quay lại kho trong phiên.
+- Trên màn hình hẹp, nội dung đứng trước mục lục sách và tài liệu bổ sung cả trong DOM và bố cục. Bộ chọn môn/sách nằm ở kho; bài có lối về đổi bài/môn. Nguồn và nghe toàn bài mở theo nhu cầu.
+- Bài có URL `/?bai=<id>&hoat-dong=ask|quiz#<nguon>` (đọc bỏ hoat-dong); nút tiến/lùi và tải lại khôi phục vị trí. Cờ phiên demo trong sessionStorage chỉ giữ trạng thái giao diện, không phải xác thực.
+- Biên tập theo từng mục; tách Nội dung / Nguồn & nhập tệp / Luyện tập / Video. Nút lưu nháp ở thanh trên bám khi cuộn; bảng nhập từng ô. Giữ nguyên mã nguồn, cơ chế nháp/công bố và dữ liệu cũ.

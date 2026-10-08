@@ -7,21 +7,55 @@ export function normalize(value: string) {
     .replace(/đ/gi, "d")
     .toLowerCase();
 }
+export function titleMatches(lesson: Lesson, query: string) {
+  const term = normalize(query.trim());
+  const number = term.match(/^(?:bai\s*)?0*(\d+)$/);
+  return number
+    ? lesson.textbook?.lessonNumber === Number(number[1])
+    : normalize(
+        `Bài ${lesson.textbook?.lessonNumber ?? ""} ${lesson.title}`,
+      ).includes(term);
+}
+export function hasReading(lesson: Lesson) {
+  return lesson.sections.some((s) => sectionText(s).trim().length > 0);
+}
+export function contentLabel(lesson: Lesson) {
+  if (hasReading(lesson))
+    return lesson.provenance?.kind === "demo" || !lesson.provenance
+      ? "Bài đọc mẫu"
+      : "Có bài đọc";
+  return /^[\w-]{11}$/.test(lesson.youtubeVideoId ?? "")
+    ? "Chỉ có video tham khảo"
+    : "Chưa nhập nội dung";
+}
 export function searchLessons(lessons: Lesson[], query: string) {
   const term = normalize(query.trim());
+  const numberOnly = /^(?:bai\s*)?\d+$/.test(term);
   return lessons
     .filter((l) => l.status === "published")
-    .filter(
-      (l) =>
-        !term ||
-        normalize(
-          l.title +
-            " " +
-            l.summary +
-            " " +
-            l.sections.map((s) => s.heading + " " + sectionText(s)).join(" "),
-        ).includes(term),
-    );
+    .map((lesson, index) => ({
+      lesson,
+      index,
+      score:
+        !term || titleMatches(lesson, query)
+          ? 3
+          : numberOnly
+            ? 0
+            : normalize(lesson.chapter).includes(term)
+              ? 2
+              : normalize(
+                    lesson.summary +
+                      " " +
+                      lesson.sections
+                        .map((s) => s.heading + " " + sectionText(s))
+                        .join(" "),
+                  ).includes(term)
+                ? 1
+                : 0,
+    }))
+    .filter((r) => r.score > 0)
+    .sort((a, b) => b.score - a.score || a.index - b.index)
+    .map((r) => r.lesson);
 }
 export function askLesson(lesson: Lesson, question: string): Answer {
   const stop = new Set([

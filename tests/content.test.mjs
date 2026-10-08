@@ -11,7 +11,53 @@ import {
   restoreWorkspace,
   saveDraft,
 } from "../app/services/content.ts";
-import { askLesson, searchLessons } from "../app/services/learning.ts";
+import {
+  askLesson,
+  searchLessons,
+  titleMatches,
+  hasReading,
+  contentLabel,
+} from "../app/services/learning.ts";
+
+test("number searches match exact textbook lesson and title matches start at the beginning", () => {
+  for (const query of ["bài 6", "BAI 06", "6"])
+    assert.deepEqual(
+      searchLessons(initialLessons, query).map((l) => l.id),
+      ["cach-mang-thang-tam"],
+    );
+  assert.equal(titleMatches(sample(), "cach mang thang tam"), true);
+  assert.equal(titleMatches(sample(), "Ha Noi"), false);
+  assert.deepEqual(searchLessons(initialLessons, "bài 999"), []);
+});
+test("title results rank before content results; chapter searches remain supported", () => {
+  const bodyMatch = sample();
+  bodyMatch.title = "Bài đọc khác";
+  bodyMatch.textbook.lessonNumber = 99;
+  const result = searchLessons([bodyMatch, sample()], "Cách mạng tháng Tám");
+  assert.equal(result[0].title, sample().title);
+  assert.ok(
+    searchLessons(initialLessons, "Chủ đề 4").every((l) =>
+      l.chapter.startsWith("Chủ đề 4"),
+    ),
+  );
+});
+test("catalog distinguishes readable content, video-only and empty syllabus entries", () => {
+  assert.equal(initialLessons.filter(hasReading).length, 2);
+  assert.equal(contentLabel(sample()), "Bài đọc mẫu");
+  const empty = { ...sample(), sections: [] };
+  assert.equal(contentLabel(empty), "Chưa nhập nội dung");
+  assert.equal(
+    contentLabel({ ...empty, youtubeVideoId: "abcdefghijk" }),
+    "Chỉ có video tham khảo",
+  );
+  assert.equal(
+    hasReading({
+      ...empty,
+      sections: [{ id: "empty", heading: "Mục", body: "  " }],
+    }),
+    false,
+  );
+});
 const workspace = () => ({
   schemaVersion: 2,
   published: structuredClone(initialLessons),

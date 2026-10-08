@@ -4,12 +4,12 @@
 
 1. Chạy `npm run dev`. Đăng nhập demo, vào **Cài đặt & tài khoản**, chọn **Cô Lan · Giáo viên**.
 2. Vào **Quản lý học liệu → Biên tập** ở bài cần nhập. Bài 6 Lịch sử 12 là điểm bắt đầu; nội dung có sẵn vẫn là mẫu, chưa phải nội dung SGK.
-3. Mở **Nhập từ tài liệu hoặc bản sao JSON**. PDF có chữ: chọn khoảng trang tệp, tối đa 30 trang/lần. DOCX và TXT: nên tách riêng từng bài trước khi nhập. Giới hạn tệp 10 MB, văn bản trích xuất 150.000 ký tự.
+3. Chọn **Nguồn & nhập tệp → Nhập từ tài liệu hoặc bản sao JSON**. PDF có chữ: chọn khoảng trang tệp, tối đa 30 trang/lần. DOCX và TXT: nên tách riêng từng bài trước khi nhập. Giới hạn tệp 10 MB, văn bản trích xuất 150.000 ký tự.
 4. PDF/DOCX/TXT thêm mục mới ở cuối bản biên tập. Xóa các mục mẫu nếu thay bằng nội dung thật; phải sửa hoặc bỏ câu hỏi đang trỏ tới mục trước khi xóa mục đó. JSON khôi phục nội dung bản biên tập, yêu cầu cùng mã bài.
-5. Đối chiếu tài liệu gốc: sửa thứ tự chữ, tiêu đề, chia đoạn, chọn loại nội dung, ghi tên tài liệu và phiên bản. Điền **trang in trong tài liệu nguồn** cho từng khối. Trang tệp PDF không tự được coi là trang in.
-6. Thêm hình bằng URL HTTPS hoặc đường dẫn ảnh trong dự án. Viết mô tả ngắn; bản đồ/biểu đồ cần mô tả chi tiết. Nhập bảng với tiêu đề cột, cột đầu là tiêu đề hàng; tách bảng có ô gộp thành bảng đơn giản. Video cần bản chép lời và mô tả thông tin chỉ thể hiện qua hình ảnh.
-7. **Lưu bản nháp** để tiếp tục sau. **Xem trước và kiểm tra** để đọc bản hiển thị, sửa lỗi được liệt kê, đối chiếu nguồn và thử bàn phím/trình đọc màn hình. Chỉ xác nhận những kiểm tra thực sự đã làm.
-8. **Công bố trong demo** thay bản học sinh đọc trên trình duyệt này, giữ một bản công bố trước để mở lại thành bản nháp. **Xuất JSON để sao lưu** tạo tệp trên máy; nên dùng sau mỗi phiên biên tập.
+5. Chọn **Nội dung → Mục đang biên tập** để sửa từng mục. Đối chiếu tài liệu gốc: sửa thứ tự chữ, tiêu đề, chia đoạn, chọn loại nội dung, ghi tên tài liệu và phiên bản. Điền **trang in trong tài liệu nguồn** cho từng khối. Trang tệp PDF không tự được coi là trang in.
+6. Thêm hình bằng URL HTTPS hoặc đường dẫn ảnh trong dự án. Viết mô tả ngắn; bản đồ/biểu đồ cần mô tả chi tiết. Nhập bảng trực tiếp vào từng ô, dùng nút Thêm hàng/Thêm cột; cột đầu là tiêu đề hàng; tách bảng có ô gộp thành bảng đơn giản. Video cần bản chép lời và mô tả thông tin chỉ thể hiện qua hình ảnh.
+7. **Lưu bản nháp** ở thanh trên (luôn hiện khi cuộn) để tiếp tục sau. **Xem trước và kiểm tra** để đọc bản hiển thị, sửa lỗi được liệt kê, đối chiếu nguồn và thử bàn phím/trình đọc màn hình. Chỉ xác nhận những kiểm tra thực sự đã làm.
+8. **Công bố trong demo** thay bản học sinh đọc trên trình duyệt này, giữ một bản công bố trước để mở lại thành bản nháp. **Nguồn & nhập tệp → Tải bản sao học liệu (JSON)** tạo tệp trên máy; nên dùng sau mỗi phiên biên tập.
 
 Nếu có PDF nguồn, có thể mở đối chiếu trong trình biên tập; tệp gốc chỉ tồn tại trong phiên và phải lưu riêng. PDF scan chưa có OCR. Word chỉ lấy văn bản, không tự phục dựng hình, bảng, số trang hay thứ tự đọc đúng. Không gửi tài liệu tới dịch vụ AI.
 

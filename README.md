@@ -2,6 +2,13 @@
 
 Ứng dụng Next.js + TypeScript, chạy cục bộ, không cần khóa API.
 
+## Tài liệu thiết kế và kế hoạch
+
+- [Thiết kế hệ thống](docs/system-design.md): kiến trúc mục tiêu, mô hình dữ liệu, phân quyền, API, phiên bản học liệu, tiếp cận và vận hành.
+- [Kế hoạch triển khai](docs/implementation-plan.md): các giai đoạn, công việc, phụ thuộc và tiêu chí nghiệm thu.
+
+Đây là thiết kế cho bước nâng cấp tiếp theo; backend Supabase và các API mục tiêu chưa được triển khai.
+
 ## Chạy
 
 ```sh

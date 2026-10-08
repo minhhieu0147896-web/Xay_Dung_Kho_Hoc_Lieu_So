@@ -9,6 +9,7 @@ import {
   publicationIssues,
 } from "../services/content";
 import ContentBlocks from "./content-blocks";
+import TableEditor from "./table-editor";
 
 type Review = { source: boolean; accessibility: boolean };
 type Props = {
@@ -27,6 +28,14 @@ export default function LessonEditor({
 }: Props) {
   const [draft, setDraft] = useState(() => materialize(lesson));
   const [preview, setPreview] = useState(false);
+  const [pane, setPane] = useState("sections");
+  const [activeSection, setActiveSection] = useState(
+    lesson.sections[0]?.id ?? "",
+  );
+  const selectedSection = draft.sections.some((s) => s.id === activeSection)
+    ? activeSection
+    : draft.sections[0]?.id;
+
   const [review, setReview] = useState<Review>(blankReview);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
@@ -226,14 +235,24 @@ export default function LessonEditor({
         >
           ← Danh sách bài {dirty ? "(lưu nháp trước khi về)" : ""}
         </button>
-        <span>{dirty ? "Có thay đổi chưa lưu" : "Bản biên tập"}</span>
+        <span role="status">
+          {dirty ? "Có thay đổi chưa lưu" : "Bản biên tập"}
+        </span>
+        <button
+          type="button"
+          className="primary"
+          disabled={loading}
+          onClick={() => commit(false)}
+        >
+          Lưu bản nháp
+        </button>
       </div>
       <h2 ref={titleRef} tabIndex={-1}>
         {draft.title}
       </h2>
       <p className="source-note">
-        Lưu và công bố trong bản demo chỉ có hiệu lực trên trình duyệt này. Xuất
-        JSON để giữ một bản sao trên máy.
+        Lưu và công bố trong bản demo chỉ có hiệu lực trên trình duyệt này. Tải
+        bản sao trong mục Nguồn & nhập tệp để lưu riêng trên máy.
       </p>
       <div className="authoring-tabs" aria-label="Chế độ biên tập">
         <button
@@ -268,489 +287,514 @@ export default function LessonEditor({
         hidden={preview}
       >
         <legend className="sr-only">Nhập và biên tập</legend>
-        <details className="import-panel">
-          <summary>Nhập từ tài liệu hoặc bản sao JSON</summary>
-          <p>
-            PDF/Word: trích xuất chữ trên máy chủ của ứng dụng, không gửi tới
-            dịch vụ AI. TXT/PDF/Word thêm vào cuối bản nháp; JSON thay nội dung
-            bản nháp. Tối đa 10 MB.
-          </p>
+        <nav className="editor-panes" aria-label="Phần cần biên tập">
+          {[
+            ["sections", "Nội dung"],
+            ["source", "Nguồn & nhập tệp"],
+            ["questions", "Luyện tập"],
+            ["media", "Video"],
+          ].map(([id, label]) => (
+            <button
+              key={id}
+              type="button"
+              aria-pressed={pane === id}
+              onClick={() => setPane(id)}
+            >
+              {label}
+            </button>
+          ))}
+        </nav>
+        <div hidden={pane !== "source"}>
+          <button type="button" className="secondary" onClick={exportJson}>
+            Tải bản sao học liệu (JSON)
+          </button>
+          <details className="import-panel">
+            <summary>Nhập từ tài liệu hoặc bản sao JSON</summary>
+            <p>
+              PDF/Word: trích xuất chữ trên máy chủ của ứng dụng, không gửi tới
+              dịch vụ AI. TXT/PDF/Word thêm vào cuối bản nháp; JSON thay nội
+              dung bản nháp. Tối đa 10 MB.
+            </p>
+            <label>
+              Tài liệu nguồn
+              <input
+                type="file"
+                accept=".pdf,.docx,.txt,.json"
+                onChange={(e) => {
+                  setFile(e.target.files?.[0] ?? null);
+                  setFileUrl("");
+                  setError("");
+                }}
+              />
+            </label>
+            {file?.name.toLowerCase().endsWith(".pdf") && (
+              <div className="source-fields">
+                <label>
+                  Từ trang tệp
+                  <input
+                    type="number"
+                    min={1}
+                    value={from}
+                    onChange={(e) => setFrom(e.target.value)}
+                  />
+                </label>
+                <label>
+                  Đến trang tệp
+                  <input
+                    type="number"
+                    min={1}
+                    value={to}
+                    onChange={(e) => setTo(e.target.value)}
+                  />
+                </label>
+              </div>
+            )}
+            <button
+              type="button"
+              className="secondary"
+              disabled={!file}
+              onClick={importFile}
+            >
+              Nhập vào bản biên tập
+            </button>
+            <p>
+              PDF scan chưa hỗ trợ OCR. Hình, bảng và thứ tự đọc cần đối chiếu
+              thủ công.
+            </p>
+            {!!warnings.length && (
+              <ul>
+                {warnings.map((w) => (
+                  <li key={w}>{w}</li>
+                ))}
+              </ul>
+            )}
+          </details>
+          {fileUrl && (
+            <details className="source-document">
+              <summary>Đối chiếu PDF nguồn đang chọn</summary>
+              <p>
+                Tệp chỉ được giữ trong phiên này. Lưu bản gốc riêng để đối chiếu
+                về sau.
+              </p>
+              <a href={fileUrl} target="_blank" rel="noreferrer">
+                Mở PDF nguồn ở thẻ mới
+              </a>
+              <iframe title="PDF nguồn để đối chiếu" src={fileUrl} />
+            </details>
+          )}
           <label>
-            Tài liệu nguồn
+            Tên bài
             <input
-              type="file"
-              accept=".pdf,.docx,.txt,.json"
-              onChange={(e) => {
-                setFile(e.target.files?.[0] ?? null);
-                setFileUrl("");
-                setError("");
-              }}
+              value={draft.title}
+              onChange={(e) => change({ ...draft, title: e.target.value })}
             />
           </label>
-          {file?.name.toLowerCase().endsWith(".pdf") && (
-            <div className="source-fields">
-              <label>
-                Từ trang tệp
-                <input
-                  type="number"
-                  min={1}
-                  value={from}
-                  onChange={(e) => setFrom(e.target.value)}
-                />
-              </label>
-              <label>
-                Đến trang tệp
-                <input
-                  type="number"
-                  min={1}
-                  value={to}
-                  onChange={(e) => setTo(e.target.value)}
-                />
-              </label>
-            </div>
-          )}
-          <button
-            type="button"
-            className="secondary"
-            disabled={!file}
-            onClick={importFile}
-          >
-            Nhập vào bản biên tập
-          </button>
-          <p>
-            PDF scan chưa hỗ trợ OCR. Hình, bảng và thứ tự đọc cần đối chiếu thủ
-            công.
-          </p>
-          {!!warnings.length && (
-            <ul>
-              {warnings.map((w) => (
-                <li key={w}>{w}</li>
-              ))}
-            </ul>
-          )}
-        </details>
-        {fileUrl && (
-          <details className="source-document">
-            <summary>Đối chiếu PDF nguồn đang chọn</summary>
-            <p>
-              Tệp chỉ được giữ trong phiên này. Lưu bản gốc riêng để đối chiếu
-              về sau.
-            </p>
-            <a href={fileUrl} target="_blank" rel="noreferrer">
-              Mở PDF nguồn ở thẻ mới
-            </a>
-            <iframe title="PDF nguồn để đối chiếu" src={fileUrl} />
-          </details>
-        )}
-        <label>
-          Tên bài
-          <input
-            value={draft.title}
-            onChange={(e) => change({ ...draft, title: e.target.value })}
-          />
-        </label>
-        <div className="source-fields">
+          <div className="source-fields">
+            <label>
+              Loại nội dung
+              <select
+                value={draft.provenance?.kind ?? "demo"}
+                onChange={(e) =>
+                  change({
+                    ...draft,
+                    provenance: {
+                      title: "",
+                      edition: "",
+                      ...draft.provenance,
+                      kind: e.target.value as
+                        "demo" | "textbook" | "adaptation",
+                    },
+                  })
+                }
+              >
+                <option value="demo">Dữ liệu mẫu</option>
+                <option value="textbook">Nội dung từ sách giáo khoa</option>
+                <option value="adaptation">Diễn giải / học liệu bổ sung</option>
+              </select>
+            </label>
+            <label>
+              Phiên bản / năm xuất bản
+              <input
+                value={draft.provenance?.edition ?? ""}
+                onChange={(e) =>
+                  change({
+                    ...draft,
+                    provenance: {
+                      kind: "demo",
+                      title: "",
+                      ...draft.provenance,
+                      edition: e.target.value,
+                    },
+                  })
+                }
+              />
+            </label>
+          </div>
           <label>
-            Loại nội dung
-            <select
-              value={draft.provenance?.kind ?? "demo"}
-              onChange={(e) =>
-                change({
-                  ...draft,
-                  provenance: {
-                    title: "",
-                    edition: "",
-                    ...draft.provenance,
-                    kind: e.target.value as "demo" | "textbook" | "adaptation",
-                  },
-                })
-              }
-            >
-              <option value="demo">Dữ liệu mẫu</option>
-              <option value="textbook">Nội dung từ sách giáo khoa</option>
-              <option value="adaptation">Diễn giải / học liệu bổ sung</option>
-            </select>
-          </label>
-          <label>
-            Phiên bản / năm xuất bản
+            Tên tài liệu nguồn
             <input
-              value={draft.provenance?.edition ?? ""}
+              value={draft.provenance?.title ?? ""}
               onChange={(e) =>
                 change({
                   ...draft,
                   provenance: {
                     kind: "demo",
-                    title: "",
+                    edition: "",
                     ...draft.provenance,
-                    edition: e.target.value,
+                    title: e.target.value,
                   },
                 })
               }
             />
           </label>
+          <label>
+            Ghi chú nguồn và phạm vi sử dụng
+            <textarea
+              rows={2}
+              value={draft.source}
+              onChange={(e) => change({ ...draft, source: e.target.value })}
+            />
+          </label>
         </div>
-        <label>
-          Tên tài liệu nguồn
-          <input
-            value={draft.provenance?.title ?? ""}
-            onChange={(e) =>
-              change({
-                ...draft,
-                provenance: {
-                  kind: "demo",
-                  edition: "",
-                  ...draft.provenance,
-                  title: e.target.value,
-                },
-              })
-            }
-          />
-        </label>
-        <label>
-          Ghi chú nguồn và phạm vi sử dụng
-          <textarea
-            rows={2}
-            value={draft.source}
-            onChange={(e) => change({ ...draft, source: e.target.value })}
-          />
-        </label>
-        {draft.sections.map((section, sectionIndex) => (
-          <fieldset className="section-editor" key={section.id}>
-            <legend>Mục {sectionIndex + 1}</legend>
-            <label>
-              Tiêu đề mục {sectionIndex + 1}
-              <input
-                value={section.heading}
-                onChange={(e) =>
-                  change({
-                    ...draft,
-                    sections: draft.sections.map((s) =>
-                      s.id === section.id
-                        ? { ...s, heading: e.target.value }
-                        : s,
-                    ),
-                  })
-                }
-              />
-            </label>
-            <div className="section-actions">
-              <button
-                type="button"
-                className="inline-link"
-                disabled={sectionIndex === 0}
-                onClick={() => {
-                  const sections = [...draft.sections];
-                  [sections[sectionIndex - 1], sections[sectionIndex]] = [
-                    sections[sectionIndex],
-                    sections[sectionIndex - 1],
-                  ];
-                  change({ ...draft, sections });
-                }}
-              >
-                Đưa mục lên
-              </button>
-              <button
-                type="button"
-                className="inline-link"
-                disabled={draft.questions.some(
-                  (q) => q.sourceSectionId === section.id,
-                )}
-                onClick={() =>
-                  change({
-                    ...draft,
-                    sections: draft.sections.filter((s) => s.id !== section.id),
-                  })
-                }
-              >
-                Bỏ mục khỏi bản nháp
-              </button>
-            </div>
-            {blocksOf(section).map((block, blockIndex) => (
-              <fieldset className="block-editor" key={block.id}>
-                <legend id={`edit-${block.id}`} tabIndex={-1}>
-                  Khối {blockIndex + 1} ·{" "}
-                  {
-                    {
-                      paragraph: "Đoạn văn",
-                      list: "Danh sách",
-                      image: "Hình ảnh",
-                      table: "Bảng",
-                    }[block.type]
+        <div hidden={pane !== "sections"}>
+          <label className="section-picker">
+            Mục đang biên tập
+            <select
+              value={selectedSection ?? ""}
+              onChange={(e) => setActiveSection(e.target.value)}
+            >
+              {!draft.sections.length && (
+                <option value="">Chưa có mục — hãy thêm mục đầu tiên</option>
+              )}
+              {draft.sections.map((s, i) => (
+                <option key={s.id} value={s.id}>
+                  {i + 1}. {s.heading || "Chưa đặt tên"}
+                </option>
+              ))}
+            </select>
+          </label>
+          {draft.sections.map((section, sectionIndex) => (
+            <fieldset
+              className="section-editor"
+              key={section.id}
+              hidden={section.id !== selectedSection}
+            >
+              <legend>Mục {sectionIndex + 1}</legend>
+              <label>
+                Tiêu đề mục {sectionIndex + 1}
+                <input
+                  value={section.heading}
+                  onChange={(e) =>
+                    change({
+                      ...draft,
+                      sections: draft.sections.map((s) =>
+                        s.id === section.id
+                          ? { ...s, heading: e.target.value }
+                          : s,
+                      ),
+                    })
                   }
-                </legend>
-                {block.type === "paragraph" && (
+                />
+              </label>
+              <div className="section-actions">
+                <button
+                  type="button"
+                  className="inline-link"
+                  disabled={sectionIndex === 0}
+                  aria-label={`Đưa mục lên: ${section.heading}`}
+                  onClick={() => {
+                    const sections = [...draft.sections];
+                    [sections[sectionIndex - 1], sections[sectionIndex]] = [
+                      sections[sectionIndex],
+                      sections[sectionIndex - 1],
+                    ];
+                    change({ ...draft, sections });
+                  }}
+                >
+                  Đưa mục lên
+                </button>
+                <button
+                  type="button"
+                  className="inline-link"
+                  aria-label={`Bỏ mục khỏi bản nháp: ${section.heading}`}
+                  disabled={draft.questions.some(
+                    (q) => q.sourceSectionId === section.id,
+                  )}
+                  onClick={() =>
+                    change({
+                      ...draft,
+                      sections: draft.sections.filter(
+                        (s) => s.id !== section.id,
+                      ),
+                    })
+                  }
+                >
+                  Bỏ mục khỏi bản nháp
+                </button>
+              </div>
+              {blocksOf(section).map((block, blockIndex) => (
+                <fieldset className="block-editor" key={block.id}>
+                  <legend id={`edit-${block.id}`} tabIndex={-1}>
+                    Nội dung {blockIndex + 1} ·{" "}
+                    {
+                      {
+                        paragraph: "Đoạn văn",
+                        list: "Danh sách",
+                        image: "Hình ảnh",
+                        table: "Bảng",
+                      }[block.type]
+                    }
+                  </legend>
+                  {block.type === "paragraph" && (
+                    <label>
+                      Nội dung đoạn
+                      <textarea
+                        rows={5}
+                        value={block.text}
+                        onChange={(e) =>
+                          changeBlock(section.id, {
+                            ...block,
+                            text: e.target.value,
+                          })
+                        }
+                      />
+                    </label>
+                  )}
+                  {block.type === "list" && (
+                    <>
+                      <label>
+                        <input
+                          type="checkbox"
+                          checked={block.ordered}
+                          onChange={(e) =>
+                            changeBlock(section.id, {
+                              ...block,
+                              ordered: e.target.checked,
+                            })
+                          }
+                        />{" "}
+                        Danh sách đánh số
+                      </label>
+                      <label>
+                        Mỗi ý một dòng
+                        <textarea
+                          rows={4}
+                          value={block.items.join("\n")}
+                          onChange={(e) =>
+                            changeBlock(section.id, {
+                              ...block,
+                              items: e.target.value.split("\n"),
+                            })
+                          }
+                        />
+                      </label>
+                    </>
+                  )}
+                  {block.type === "image" && (
+                    <>
+                      <label>
+                        Đường dẫn ảnh (HTTPS hoặc /đường-dẫn)
+                        <input
+                          value={block.src}
+                          onChange={(e) =>
+                            changeBlock(section.id, {
+                              ...block,
+                              src: e.target.value,
+                            })
+                          }
+                        />
+                      </label>
+                      <label>
+                        Mô tả ngắn cho người không thấy ảnh
+                        <input
+                          value={block.alt}
+                          onChange={(e) =>
+                            changeBlock(section.id, {
+                              ...block,
+                              alt: e.target.value,
+                            })
+                          }
+                        />
+                      </label>
+                      <label>
+                        Chú thích ảnh
+                        <input
+                          value={block.caption}
+                          onChange={(e) =>
+                            changeBlock(section.id, {
+                              ...block,
+                              caption: e.target.value,
+                            })
+                          }
+                        />
+                      </label>
+                      <label>
+                        <input
+                          type="checkbox"
+                          checked={block.complex}
+                          onChange={(e) =>
+                            changeBlock(section.id, {
+                              ...block,
+                              complex: e.target.checked,
+                            })
+                          }
+                        />{" "}
+                        Bản đồ, biểu đồ hoặc hình phức tạp
+                      </label>
+                      <label>
+                        Mô tả chi tiết thông tin trong hình
+                        <textarea
+                          rows={4}
+                          value={block.description}
+                          onChange={(e) =>
+                            changeBlock(section.id, {
+                              ...block,
+                              description: e.target.value,
+                            })
+                          }
+                        />
+                      </label>
+                    </>
+                  )}
+                  {block.type === "table" && (
+                    <>
+                      <label>
+                        Tên bảng
+                        <input
+                          value={block.caption}
+                          onChange={(e) =>
+                            changeBlock(section.id, {
+                              ...block,
+                              caption: e.target.value,
+                            })
+                          }
+                        />
+                      </label>
+                      <TableEditor
+                        block={block}
+                        onChange={(next) => changeBlock(section.id, next)}
+                      />
+                    </>
+                  )}
                   <label>
-                    Nội dung đoạn
-                    <textarea
-                      rows={5}
-                      value={block.text}
+                    Trang in trong tài liệu nguồn
+                    <input
+                      type="number"
+                      min={1}
+                      max={10000}
+                      value={block.page ?? ""}
                       onChange={(e) =>
                         changeBlock(section.id, {
                           ...block,
-                          text: e.target.value,
+                          page: e.target.value
+                            ? Number(e.target.value)
+                            : undefined,
                         })
                       }
                     />
                   </label>
-                )}
-                {block.type === "list" && (
-                  <>
-                    <label>
-                      <input
-                        type="checkbox"
-                        checked={block.ordered}
-                        onChange={(e) =>
-                          changeBlock(section.id, {
-                            ...block,
-                            ordered: e.target.checked,
-                          })
-                        }
-                      />{" "}
-                      Danh sách đánh số
-                    </label>
-                    <label>
-                      Mỗi ý một dòng
-                      <textarea
-                        rows={4}
-                        value={block.items.join("\n")}
-                        onChange={(e) =>
-                          changeBlock(section.id, {
-                            ...block,
-                            items: e.target.value.split("\n"),
-                          })
-                        }
-                      />
-                    </label>
-                  </>
-                )}
-                {block.type === "image" && (
-                  <>
-                    <label>
-                      Đường dẫn ảnh (HTTPS hoặc /đường-dẫn)
-                      <input
-                        value={block.src}
-                        onChange={(e) =>
-                          changeBlock(section.id, {
-                            ...block,
-                            src: e.target.value,
-                          })
-                        }
-                      />
-                    </label>
-                    <label>
-                      Mô tả ngắn cho người không thấy ảnh
-                      <input
-                        value={block.alt}
-                        onChange={(e) =>
-                          changeBlock(section.id, {
-                            ...block,
-                            alt: e.target.value,
-                          })
-                        }
-                      />
-                    </label>
-                    <label>
-                      Chú thích ảnh
-                      <input
-                        value={block.caption}
-                        onChange={(e) =>
-                          changeBlock(section.id, {
-                            ...block,
-                            caption: e.target.value,
-                          })
-                        }
-                      />
-                    </label>
-                    <label>
-                      <input
-                        type="checkbox"
-                        checked={block.complex}
-                        onChange={(e) =>
-                          changeBlock(section.id, {
-                            ...block,
-                            complex: e.target.checked,
-                          })
-                        }
-                      />{" "}
-                      Bản đồ, biểu đồ hoặc hình phức tạp
-                    </label>
-                    <label>
-                      Mô tả chi tiết thông tin trong hình
-                      <textarea
-                        rows={4}
-                        value={block.description}
-                        onChange={(e) =>
-                          changeBlock(section.id, {
-                            ...block,
-                            description: e.target.value,
-                          })
-                        }
-                      />
-                    </label>
-                  </>
-                )}
-                {block.type === "table" && (
-                  <>
-                    <label>
-                      Tên bảng
-                      <input
-                        value={block.caption}
-                        onChange={(e) =>
-                          changeBlock(section.id, {
-                            ...block,
-                            caption: e.target.value,
-                          })
-                        }
-                      />
-                    </label>
-                    <label>
-                      Tiêu đề cột, ngăn bằng dấu |
-                      <input
-                        value={block.headers.join("|")}
-                        onChange={(e) =>
-                          changeBlock(section.id, {
-                            ...block,
-                            headers: e.target.value.split("|"),
-                          })
-                        }
-                      />
-                    </label>
-                    <label>
-                      Dữ liệu: mỗi hàng một dòng, các ô ngăn bằng dấu |
-                      <textarea
-                        rows={4}
-                        value={block.rows.map((r) => r.join("|")).join("\n")}
-                        onChange={(e) =>
-                          changeBlock(section.id, {
-                            ...block,
-                            rows: e.target.value
-                              .split("\n")
-                              .map((r) => r.split("|")),
-                          })
-                        }
-                      />
-                    </label>
-                    <p>
-                      Cột đầu tiên là tiêu đề hàng. Bảng có ô gộp cần chuyển
-                      thành các bảng đơn giản.
+                  {block.filePage && (
+                    <p className="source-note">
+                      Trích từ trang tệp {block.filePage}; cần đối chiếu với
+                      trang in trong sách.
                     </p>
-                  </>
-                )}
-                <label>
-                  Trang in trong tài liệu nguồn
-                  <input
-                    type="number"
-                    min={1}
-                    max={10000}
-                    value={block.page ?? ""}
-                    onChange={(e) =>
-                      changeBlock(section.id, {
-                        ...block,
-                        page: e.target.value
-                          ? Number(e.target.value)
-                          : undefined,
-                      })
-                    }
-                  />
-                </label>
-                {block.filePage && (
-                  <p className="source-note">
-                    Trích từ trang tệp {block.filePage}; cần đối chiếu với trang
-                    in trong sách.
-                  </p>
-                )}
-                <div className="section-actions">
-                  <button
-                    type="button"
-                    className="inline-link"
-                    disabled={blockIndex === 0}
-                    onClick={() => {
-                      const blocks = [...blocksOf(section)];
-                      [blocks[blockIndex - 1], blocks[blockIndex]] = [
-                        blocks[blockIndex],
-                        blocks[blockIndex - 1],
-                      ];
-                      change({
-                        ...draft,
-                        sections: draft.sections.map((s) =>
-                          s.id === section.id ? { ...s, blocks } : s,
-                        ),
-                      });
-                    }}
-                  >
-                    Đưa khối lên
-                  </button>
-                  <button
-                    type="button"
-                    className="inline-link"
-                    onClick={() =>
-                      change({
-                        ...draft,
-                        sections: draft.sections.map((s) =>
-                          s.id === section.id
-                            ? {
-                                ...s,
-                                blocks: blocksOf(s).filter(
-                                  (b) => b.id !== block.id,
-                                ),
-                              }
-                            : s,
-                        ),
-                      })
-                    }
-                  >
-                    Bỏ khối khỏi bản nháp
-                  </button>
-                </div>
-              </fieldset>
-            ))}
-            <div className="section-actions">
-              {(["paragraph", "list", "image", "table"] as const).map(
-                (type) => (
-                  <button
-                    type="button"
-                    className="secondary"
-                    key={type}
-                    onClick={() => addBlock(section.id, type)}
-                  >
-                    Thêm{" "}
-                    {
+                  )}
+                  <div className="section-actions">
+                    <button
+                      type="button"
+                      className="inline-link"
+                      disabled={blockIndex === 0}
+                      aria-label={`Đưa nội dung lên: nội dung ${blockIndex + 1}, ${section.heading}`}
+                      onClick={() => {
+                        const blocks = [...blocksOf(section)];
+                        [blocks[blockIndex - 1], blocks[blockIndex]] = [
+                          blocks[blockIndex],
+                          blocks[blockIndex - 1],
+                        ];
+                        change({
+                          ...draft,
+                          sections: draft.sections.map((s) =>
+                            s.id === section.id ? { ...s, blocks } : s,
+                          ),
+                        });
+                      }}
+                    >
+                      Đưa nội dung lên
+                    </button>
+                    <button
+                      type="button"
+                      className="inline-link"
+                      aria-label={`Bỏ nội dung khỏi bản nháp: nội dung ${blockIndex + 1}, ${section.heading}`}
+                      onClick={() =>
+                        change({
+                          ...draft,
+                          sections: draft.sections.map((s) =>
+                            s.id === section.id
+                              ? {
+                                  ...s,
+                                  blocks: blocksOf(s).filter(
+                                    (b) => b.id !== block.id,
+                                  ),
+                                }
+                              : s,
+                          ),
+                        })
+                      }
+                    >
+                      Bỏ nội dung khỏi bản nháp
+                    </button>
+                  </div>
+                </fieldset>
+              ))}
+              <div className="section-actions">
+                {(["paragraph", "list", "image", "table"] as const).map(
+                  (type) => (
+                    <button
+                      type="button"
+                      className="secondary"
+                      key={type}
+                      onClick={() => addBlock(section.id, type)}
+                    >
+                      Thêm{" "}
                       {
-                        paragraph: "đoạn",
-                        list: "danh sách",
-                        image: "hình",
-                        table: "bảng",
-                      }[type]
-                    }
-                  </button>
-                ),
-              )}
-            </div>
-          </fieldset>
-        ))}
-        <button
-          type="button"
-          className="secondary"
-          onClick={() => {
-            const id = newId();
-            change({
-              ...draft,
-              sections: [
-                ...draft.sections,
-                {
-                  id,
-                  heading: "Mục mới",
-                  body: "",
-                  blocks: [{ id: `${id}-p1`, type: "paragraph", text: "" }],
-                },
-              ],
-            });
-          }}
-        >
-          Thêm mục
-        </button>
-        <details className="media-editor">
-          <summary>Video và bản chép lời</summary>
+                        {
+                          paragraph: "đoạn",
+                          list: "danh sách",
+                          image: "hình",
+                          table: "bảng",
+                        }[type]
+                      }
+                    </button>
+                  ),
+                )}
+              </div>
+            </fieldset>
+          ))}
+          <button
+            type="button"
+            className="secondary"
+            onClick={() => {
+              const id = newId();
+              setActiveSection(id);
+              change({
+                ...draft,
+                sections: [
+                  ...draft.sections,
+                  {
+                    id,
+                    heading: "Mục mới",
+                    body: "",
+                    blocks: [{ id: `${id}-p1`, type: "paragraph", text: "" }],
+                  },
+                ],
+              });
+            }}
+          >
+            Thêm mục
+          </button>
+        </div>
+        <div className="media-editor" hidden={pane !== "media"}>
+          <h3>Video và bản chép lời</h3>
           <label>
             Mã video YouTube
             <input
@@ -781,9 +825,9 @@ export default function LessonEditor({
               onChange={(e) => change({ ...draft, transcript: e.target.value })}
             />
           </label>
-        </details>
-        <details className="questions-editor">
-          <summary>Câu hỏi luyện tập ({draft.questions.length})</summary>
+        </div>
+        <div className="questions-editor" hidden={pane !== "questions"}>
+          <h3>Câu hỏi luyện tập ({draft.questions.length})</h3>
           {draft.questions.map((q, i) => (
             <fieldset key={q.id}>
               <legend>Câu {i + 1}</legend>
@@ -880,6 +924,7 @@ export default function LessonEditor({
               <button
                 type="button"
                 className="inline-link"
+                aria-label={`Bỏ câu hỏi khỏi bản nháp: câu ${i + 1}`}
                 onClick={() =>
                   change({
                     ...draft,
@@ -914,7 +959,7 @@ export default function LessonEditor({
           >
             Thêm câu hỏi
           </button>
-        </details>
+        </div>
       </fieldset>
       {preview && (
         <div
@@ -992,24 +1037,6 @@ export default function LessonEditor({
           </section>
         </div>
       )}
-      <div className="section-actions">
-        <button
-          type="button"
-          className="primary"
-          disabled={loading}
-          onClick={() => commit(false)}
-        >
-          Lưu bản nháp
-        </button>
-        <button
-          type="button"
-          className="secondary"
-          disabled={loading}
-          onClick={exportJson}
-        >
-          Xuất JSON để sao lưu
-        </button>
-      </div>
     </section>
   );
 }

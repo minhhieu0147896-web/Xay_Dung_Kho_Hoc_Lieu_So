@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useEffectEvent, useRef, useState } from "react";
 import HomePage from "./home-page";
 import CoursePicker, {
   defaultCourse,
@@ -26,7 +26,12 @@ import {
   type Progress,
   type Answer,
 } from "../data/lessons";
-import { askLesson, readStored, writeStored } from "../services/learning";
+import {
+  askLesson,
+  readStored,
+  writeStored,
+  contentLabel,
+} from "../services/learning";
 
 type View = "home" | "settings" | "progress" | "reader" | "teacher" | "admin";
 const users = [
@@ -71,7 +76,6 @@ export default function LearningApp() {
   const [signedIn, setSignedIn] = useState(false);
   const [readerMode, setReaderMode] = useState<"read" | "ask" | "quiz">("read");
   const [course, setCourse] = useState<Course>(defaultCourse);
-  const [resource, setResource] = useState<"paper" | "youtube" | "ai">("paper");
   const [ready, setReady] = useState(false);
   const [view, setView] = useState<View>("home");
   const [workspace, setWorkspace] = useState<Workspace>({
@@ -88,6 +92,7 @@ export default function LearningApp() {
   const [large, setLarge] = useState(false);
   const [contrast, setContrast] = useState(false);
   const [query, setQuery] = useState("");
+  const [showAllLessons, setShowAllLessons] = useState(false);
   const [selected, setSelected] = useState(initialLessons[0].id);
   const [logs, setLogs] = useState<string[]>([]);
   const [notice, setNotice] = useState("");
@@ -101,6 +106,7 @@ export default function LearningApp() {
   const [submitted, setSubmitted] = useState(false);
   const [editor, setEditor] = useState<Lesson | null>(null);
   const [storageProblem, setStorageProblem] = useState(false);
+  const lastUrl = useRef("/");
   const headingRef = useRef<HTMLHeadingElement>(null);
   const answerRef = useRef<HTMLDivElement>(null);
   const resultRef = useRef<HTMLDivElement>(null);
@@ -161,6 +167,11 @@ export default function LearningApp() {
       setLarge(prefs.large);
       setContrast(prefs.contrast);
       setSpeechAvailable("speechSynthesis" in window);
+      try {
+        setSignedIn(sessionStorage.getItem("suhoc-demo-session") === "yes");
+      } catch {
+        /* Session-only fallback. */
+      }
       setReady(true);
     }, 0);
     return () => {
@@ -169,6 +180,98 @@ export default function LearningApp() {
       if ("speechSynthesis" in window) window.speechSynthesis.cancel();
     };
   }, []);
+  function updateUrl(next: View, id = selected, mode = "read", sectionId = "") {
+    const params = new URLSearchParams();
+    if (next === "reader") {
+      params.set("bai", id);
+      if (mode !== "read") params.set("hoat-dong", mode);
+    } else if (next !== "home") params.set("trang", next);
+    const url =
+      "/" +
+      (params.size ? `?${params}` : "") +
+      (sectionId ? `#${encodeURIComponent(sectionId)}` : "");
+    if (
+      url !==
+      window.location.pathname + window.location.search + window.location.hash
+    )
+      window.history.pushState(null, "", url);
+    lastUrl.current = url;
+  }
+  const restoreLocation = useEffectEvent(() => {
+    if (editor) {
+      const error = commitEditor(editor, false, {
+        source: false,
+        accessibility: false,
+      });
+      if (error) {
+        setNotice(error);
+        window.history.replaceState(null, "", lastUrl.current);
+        return;
+      }
+      setEditor(null);
+    }
+    stopSpeech();
+    const params = new URLSearchParams(window.location.search);
+    const target = lessons.find((l) => l.id === params.get("bai"));
+    const page = params.get("trang");
+    const next: View = target
+      ? "reader"
+      : page === "settings" ||
+          page === "progress" ||
+          (page === "teacher" && user.role === "Giáo viên") ||
+          (page === "admin" && user.role === "Quản trị")
+        ? page
+        : "home";
+    setView(next);
+    if (target) {
+      if (target.id !== selected) {
+        if (askTimer.current) clearTimeout(askTimer.current);
+        setBusy(false);
+        setAnswer(null);
+        setQuestion("");
+        setChoices({});
+        setSubmitted(false);
+      }
+      setSelected(target.id);
+      setCourse({
+        subject: target.subject,
+        grade: target.grade,
+        book: bookId(target),
+      });
+    }
+    const mode = params.get("hoat-dong");
+    setReaderMode(mode === "ask" || mode === "quiz" ? mode : "read");
+    lastUrl.current =
+      window.location.pathname + window.location.search + window.location.hash;
+    if (params.has("bai") && !target)
+      setNotice(
+        "Không tìm thấy bài trong đường dẫn. Bạn có thể chọn lại trong kho học liệu.",
+      );
+    let anchor = "";
+    try {
+      anchor = decodeURIComponent(window.location.hash.slice(1));
+    } catch {
+      /* Ignore malformed external fragments. */
+    }
+    requestAnimationFrame(() => {
+      const element = anchor
+        ? document.getElementById(anchor)
+        : headingRef.current;
+      element?.focus();
+      if (anchor) element?.scrollIntoView({ block: "center" });
+      else window.scrollTo({ top: 0 });
+    });
+  });
+  useEffect(() => {
+    if (!ready) return;
+    const timer = setTimeout(() => restoreLocation(), 0);
+    const onBack = () => restoreLocation();
+    window.addEventListener("popstate", onBack);
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener("popstate", onBack);
+    };
+  }, [ready]);
   function persist(key: string, value: unknown) {
     if (!writeStored(key, value))
       setNotice(
@@ -199,7 +302,7 @@ export default function LearningApp() {
         ? publishDraft(workspace, input, review)
         : saveDraft(workspace, input);
       if (!writeStored("suhoc-content-v2", next))
-        return "Chưa lưu được: bộ nhớ trình duyệt bị chặn hoặc đã đầy. Hãy xuất JSON để giữ bản biên tập.";
+        return "Chưa lưu được: bộ nhớ trình duyệt bị chặn hoặc đã đầy. Hãy tải bản sao trong Nguồn & nhập tệp để giữ bản biên tập.";
       setWorkspace(next);
       if (publish) {
         setEditor(null);
@@ -216,7 +319,7 @@ export default function LearningApp() {
         : "Không lưu được học liệu.";
     }
   }
-  function navigate(next: View) {
+  function navigate(next: View, lessonId = selected) {
     if (editor && next !== "teacher") {
       const error = commitEditor(editor, false, {
         source: false,
@@ -232,8 +335,8 @@ export default function LearningApp() {
     if (askTimer.current) clearTimeout(askTimer.current);
     setBusy(false);
     setView(next);
+    updateUrl(next, lessonId);
     setReaderMode("read");
-    setResource("paper");
     setAnswer(null);
     setQuestion("");
     setChoices({});
@@ -244,8 +347,13 @@ export default function LearningApp() {
       window.scrollTo({ top: 0 });
     });
   }
-  function jump(id: string) {
-    setResource(id === "ask" || id === "quiz" ? "ai" : "paper");
+  function jump(id: string, lessonId = selected) {
+    updateUrl(
+      "reader",
+      lessonId,
+      id === "ask" ? "ask" : id === "quiz" ? "quiz" : "read",
+      id,
+    );
     setReaderMode(id === "ask" ? "ask" : id === "quiz" ? "quiz" : "read");
     stopSpeech();
     requestAnimationFrame(() => {
@@ -257,7 +365,7 @@ export default function LearningApp() {
   function switchReader(mode: "read" | "ask" | "quiz") {
     stopSpeech();
     setReaderMode(mode);
-    setResource(mode === "read" ? "paper" : "ai");
+    updateUrl("reader", selected, mode);
     requestAnimationFrame(() =>
       document.getElementById(`panel-${mode}`)?.focus(),
     );
@@ -265,33 +373,14 @@ export default function LearningApp() {
   function openLesson(l: Lesson, sectionId?: string) {
     setCourse({ subject: l.subject, grade: l.grade, book: bookId(l) });
     setSelected(l.id);
-    navigate("reader");
-    if (sectionId) jump(sectionId);
-    else if (progress[l.id]?.lastSectionId) jump(progress[l.id].lastSectionId!);
+    navigate("reader", l.id);
+    if (sectionId) jump(sectionId, l.id);
   }
   function changeCourse(next: Course) {
     setCourse(next);
     setQuery("");
+    setShowAllLessons(false);
     navigate("home");
-  }
-  function chooseResource(next: "paper" | "youtube" | "ai") {
-    stopSpeech();
-    setResource(next);
-    if (next === "paper") setReaderMode("read");
-    if (next === "ai" && readerMode === "read") setReaderMode("ask");
-    requestAnimationFrame(() =>
-      document
-        .getElementById(
-          next === "youtube"
-            ? "panel-youtube"
-            : next === "paper"
-              ? "panel-read"
-              : readerMode === "quiz"
-                ? "panel-quiz"
-                : "panel-ask",
-        )
-        ?.focus(),
-    );
   }
   function saveProgress(update: Partial<Progress>) {
     const next = {
@@ -365,12 +454,35 @@ export default function LearningApp() {
     setContrast(prefs.contrast);
     persist(`suhoc-prefs-v1-${userId}`, prefs);
   }
+  if (!ready)
+    return (
+      <p role="status" className="loading-page">
+        Đang mở kho học liệu…
+      </p>
+    );
   if (!signedIn) {
     return (
       <DemoLogin
         onLogin={() => {
           setSignedIn(true);
-          navigate("home");
+          try {
+            sessionStorage.setItem("suhoc-demo-session", "yes");
+          } catch {
+            /* Keep the current in-memory session. */
+          }
+          requestAnimationFrame(() => {
+            let anchor = "";
+            try {
+              anchor = decodeURIComponent(window.location.hash.slice(1));
+            } catch {
+              /* Ignore malformed fragments. */
+            }
+            const target = anchor
+              ? document.getElementById(anchor)
+              : headingRef.current;
+            target?.focus();
+            if (anchor) target?.scrollIntoView({ block: "center" });
+          });
         }}
       />
     );
@@ -452,7 +564,7 @@ export default function LearningApp() {
         </div>
       </aside>
       <div className="main-shell">
-        {(view === "home" || view === "reader") && (
+        {view === "home" && (
           <CoursePicker
             lessons={lessons}
             value={course}
@@ -505,6 +617,8 @@ export default function LearningApp() {
               ready={ready}
               query={query}
               onQuery={setQuery}
+              all={showAllLessons}
+              setAll={setShowAllLessons}
               onOpen={openLesson}
               headingRef={headingRef}
             />
@@ -585,7 +699,7 @@ export default function LearningApp() {
                     <article className="progress-row" key={l.id}>
                       <div>
                         <span className="eyebrow">HỌC LIỆU</span>
-                        <h2>{l.title}</h2>
+                        <h2>{lessonLabel(l)}</h2>
                         <p>
                           {
                             l.sections.filter((s) =>
@@ -604,7 +718,13 @@ export default function LearningApp() {
                         />
                         <span> {percent(l)}%</span>
                       </div>
-                      <button className="primary" onClick={() => openLesson(l)}>
+                      <button
+                        className="primary"
+                        aria-label={`Tiếp tục học: ${lessonLabel(l)}`}
+                        onClick={() =>
+                          openLesson(l, progress[l.id]?.lastSectionId)
+                        }
+                      >
                         Tiếp tục học <Icon name="arrow" size={16} />
                       </button>
                     </article>
@@ -627,48 +747,18 @@ export default function LearningApp() {
           {view === "reader" && (
             <>
               <div className="textbook-layout">
-                <aside className="book-outline" aria-label="Mục lục sách">
-                  <button
-                    className="inline-link"
-                    onClick={() => navigate("home")}
-                  >
-                    ← Kho học liệu
-                  </button>
-                  <h2>Mục lục sách</h2>
-                  <p className="outline-caption">
-                    {course.subject} {course.grade} · Kết nối tri thức
-                  </p>
-                  <nav aria-label="Các bài trong sách">
-                    {[...new Set(syllabus.map((l) => l.chapter))].map(
-                      (chapter) => (
-                        <details
-                          key={chapter}
-                          open={chapter === lesson.chapter}
-                        >
-                          <summary>{chapter}</summary>
-                          {syllabus
-                            .filter((l) => l.chapter === chapter)
-                            .map((l) => (
-                              <button
-                                key={l.id}
-                                className="outline-lesson"
-                                aria-current={
-                                  l.id === lesson.id ? "page" : undefined
-                                }
-                                onClick={() => {
-                                  if (l.id !== lesson.id) openLesson(l);
-                                }}
-                              >
-                                {lessonLabel(l)}
-                              </button>
-                            ))}
-                        </details>
-                      ),
-                    )}
-                  </nav>
-                </aside>
                 <div className="reading-body">
                   <header className="lesson-heading">
+                    <div className="reader-shortcuts">
+                      <button
+                        className="inline-link"
+                        onClick={() => navigate("home")}
+                      >
+                        ← Đổi bài / môn
+                      </button>
+                      <a href="#book-navigation">Mục lục sách</a>
+                      <a href="#lesson-resources">Video</a>
+                    </div>
                     <p className="eyebrow">
                       {lesson.subject} {lesson.grade} / Bài{" "}
                       {lesson.textbook?.lessonNumber ?? ""}
@@ -691,9 +781,7 @@ export default function LearningApp() {
                     ).map((item) => (
                       <button
                         key={item.id}
-                        aria-pressed={
-                          resource !== "youtube" && readerMode === item.id
-                        }
+                        aria-pressed={readerMode === item.id}
                         aria-controls={`panel-${item.id}`}
                         onClick={() => switchReader(item.id)}
                       >
@@ -701,155 +789,108 @@ export default function LearningApp() {
                       </button>
                     ))}
                   </nav>
-                  {resource === "youtube" && (
-                    <section
-                      id="panel-youtube"
-                      tabIndex={-1}
-                      aria-label="Bài giảng YouTube"
-                      className="resource-panel"
-                    >
-                      <h2>Bài giảng YouTube</h2>
-                      {lesson.transcript ? (
-                        <details className="video-transcript">
-                          <summary>Đọc bản chép lời và mô tả video</summary>
-                          <p className="paragraph-text">{lesson.transcript}</p>
-                        </details>
-                      ) : (
-                        <p className="source-note">
-                          Video tham khảo chưa có bản chép lời và mô tả hình ảnh
-                          được kiểm tra.
-                        </p>
-                      )}
-                      {lesson.youtubeVideoId &&
-                      /^[a-zA-Z0-9_-]{11}$/.test(lesson.youtubeVideoId) ? (
-                        <>
-                          {lesson.youtubeSource && (
-                            <p>{lesson.youtubeSource}</p>
-                          )}
-                          <iframe
-                            className="lesson-video"
-                            src={`https://www.youtube-nocookie.com/embed/${lesson.youtubeVideoId}`}
-                            title={`Video bài giảng: ${lesson.title}`}
-                            allowFullScreen
-                            allow="encrypted-media; picture-in-picture"
-                          />
-                          <a
-                            href={`https://www.youtube.com/watch?v=${lesson.youtubeVideoId}`}
-                            target="_blank"
-                            rel="noreferrer"
-                          >
-                            Mở video trên YouTube ↗
-                          </a>
-                        </>
-                      ) : (
-                        <>
-                          <p>
-                            Chưa có video được gắn cho bài này. Bạn có thể tìm
-                            bài giảng theo đúng tên bài và bộ sách.
-                          </p>
-                          <a
-                            className="secondary"
-                            href={`https://www.youtube.com/results?search_query=${encodeURIComponent(`${lesson.subject} ${lesson.grade} Kết nối tri thức ${lessonLabel(lesson)}`)}`}
-                            target="_blank"
-                            rel="noreferrer"
-                          >
-                            Tìm bài giảng trên YouTube ↗
-                          </a>
-                        </>
-                      )}
-                    </section>
-                  )}
                   <section
                     id="panel-read"
                     tabIndex={-1}
                     aria-label="Đọc bài"
-                    hidden={resource !== "paper" || readerMode !== "read"}
+                    hidden={readerMode !== "read"}
                   >
-                    <div className="audio-bar" hidden={!lesson.sections.length}>
-                      <Icon name="audio" />
-                      <div>
-                        <strong>Lắng nghe bài học</strong>
-                        <small>
-                          {speechAvailable
-                            ? speech === "playing"
-                              ? "Đang đọc"
-                              : speech === "paused"
-                                ? "Đã tạm dừng"
-                                : "Giọng đọc của thiết bị"
-                            : "Thiết bị chưa hỗ trợ TTS; bạn vẫn có thể dùng trình đọc màn hình."}
-                        </small>
+                    <details
+                      className="listen-controls"
+                      hidden={!lesson.sections.length}
+                    >
+                      <summary>Nghe bài · Giọng đọc của thiết bị</summary>
+                      <div className="audio-bar">
+                        <Icon name="audio" />
+                        <div>
+                          <strong>Lắng nghe bài học</strong>
+                          <small>
+                            {speechAvailable
+                              ? speech === "playing"
+                                ? "Đang đọc"
+                                : speech === "paused"
+                                  ? "Đã tạm dừng"
+                                  : "Giọng đọc của thiết bị"
+                              : "Thiết bị chưa hỗ trợ TTS; bạn vẫn có thể dùng trình đọc màn hình."}
+                          </small>
+                        </div>
+                        {speechAvailable && (
+                          <>
+                            <label className="sr-only" htmlFor="rate">
+                              Tốc độ đọc
+                            </label>
+                            <select
+                              id="rate"
+                              value={rate}
+                              onChange={(e) => {
+                                stopSpeech();
+                                setRate(e.target.value);
+                              }}
+                            >
+                              <option value="0.8">0.8×</option>
+                              <option value="1">1×</option>
+                              <option value="1.2">1.2×</option>
+                              <option value="1.5">1.5×</option>
+                            </select>
+                            <button
+                              className="primary"
+                              onClick={() => {
+                                if (speech === "playing") {
+                                  window.speechSynthesis.pause();
+                                  setSpeech("paused");
+                                } else if (speech === "paused") {
+                                  window.speechSynthesis.resume();
+                                  setSpeech("playing");
+                                } else
+                                  speak(
+                                    lesson.title +
+                                      ". " +
+                                      lesson.sections
+                                        .map(
+                                          (s) =>
+                                            s.heading + ". " + sectionText(s),
+                                        )
+                                        .join(" "),
+                                  );
+                              }}
+                            >
+                              {speech === "playing"
+                                ? "Tạm dừng"
+                                : speech === "paused"
+                                  ? "Tiếp tục"
+                                  : "Nghe bài"}
+                            </button>
+                            <button
+                              className="secondary"
+                              onClick={stopSpeech}
+                              disabled={speech === "stopped"}
+                            >
+                              Dừng
+                            </button>
+                          </>
+                        )}
                       </div>
-                      {speechAvailable && (
-                        <>
-                          <label className="sr-only" htmlFor="rate">
-                            Tốc độ đọc
-                          </label>
-                          <select
-                            id="rate"
-                            value={rate}
-                            onChange={(e) => {
-                              stopSpeech();
-                              setRate(e.target.value);
-                            }}
-                          >
-                            <option value="0.8">0.8×</option>
-                            <option value="1">1×</option>
-                            <option value="1.2">1.2×</option>
-                            <option value="1.5">1.5×</option>
-                          </select>
-                          <button
-                            className="primary"
-                            onClick={() => {
-                              if (speech === "playing") {
-                                window.speechSynthesis.pause();
-                                setSpeech("paused");
-                              } else if (speech === "paused") {
-                                window.speechSynthesis.resume();
-                                setSpeech("playing");
-                              } else
-                                speak(
-                                  lesson.title +
-                                    ". " +
-                                    lesson.sections
-                                      .map(
-                                        (s) =>
-                                          s.heading + ". " + sectionText(s),
-                                      )
-                                      .join(" "),
-                                );
-                            }}
-                          >
-                            {speech === "playing"
-                              ? "Tạm dừng"
-                              : speech === "paused"
-                                ? "Tiếp tục"
-                                : "Nghe bài"}
-                          </button>
-                          <button
-                            className="secondary"
-                            onClick={stopSpeech}
-                            disabled={speech === "stopped"}
-                          >
-                            Dừng
-                          </button>
-                        </>
+                    </details>
+                    <details className="reading-source">
+                      <summary>
+                        {contentLabel(lesson)} · Nguồn và phạm vi sử dụng
+                      </summary>
+                      <p className="source-note">{lesson.source}</p>
+                      {lesson.provenance && (
+                        <p className="source-note">
+                          {lesson.provenance.kind === "demo"
+                            ? "Dữ liệu mẫu"
+                            : lesson.provenance.kind === "textbook"
+                              ? "Nội dung sách"
+                              : "Học liệu diễn giải"}{" "}
+                          · {lesson.provenance.title} ·{" "}
+                          {lesson.provenance.edition}
+                        </p>
                       )}
-                    </div>
-                    <p className="source-note">{lesson.source}</p>
-                    {lesson.provenance && (
-                      <p className="source-note">
-                        {lesson.provenance.kind === "demo"
-                          ? "Dữ liệu mẫu"
-                          : lesson.provenance.kind === "textbook"
-                            ? "Nội dung sách"
-                            : "Học liệu diễn giải"}{" "}
-                        · {lesson.provenance.title} ·{" "}
-                        {lesson.provenance.edition}
-                      </p>
-                    )}
+                    </details>
                     {!lesson.sections.length && (
                       <div className="resource-panel">
-                        <h2>Bản đọc đang được bổ sung</h2>
+                        <h2>Chưa nhập nội dung bài đọc</h2>
                         <p>
                           Bài này đã có trong mục lục. Nội dung sách giáo khoa
                           chưa được nhập vào ứng dụng.
@@ -885,6 +926,7 @@ export default function LearningApp() {
                                 s.id,
                               ) ?? false
                             }
+                            aria-label={`${currentProgress?.completedSectionIds.includes(s.id) ? "Đã đọc mục này" : "Đánh dấu đã đọc"}: ${s.heading}`}
                             onClick={() => toggleSection(s.id)}
                           >
                             <Icon name="check" size={16} />
@@ -898,6 +940,7 @@ export default function LearningApp() {
                               onClick={() =>
                                 speak(s.heading + ". " + sectionText(s))
                               }
+                              aria-label={`Nghe mục này: ${s.heading}`}
                             >
                               <Icon name="audio" size={16} />
                               Nghe mục này
@@ -906,30 +949,13 @@ export default function LearningApp() {
                         </div>
                       </section>
                     ))}
-                    <div
-                      className="section-actions"
-                      hidden={!lesson.sections.length}
-                    >
-                      <button
-                        className="secondary"
-                        onClick={() => switchReader("ask")}
-                      >
-                        Hỏi về bài học
-                      </button>
-                      <button
-                        className="primary"
-                        onClick={() => switchReader("quiz")}
-                      >
-                        Chuyển sang luyện tập
-                      </button>
-                    </div>
                   </section>
                   <section
                     className="ask-panel"
                     id="panel-ask"
                     tabIndex={-1}
                     aria-labelledby="ask"
-                    hidden={resource !== "ai" || readerMode !== "ask"}
+                    hidden={readerMode !== "ask"}
                   >
                     <span className="eyebrow green">
                       <Icon name="spark" size={15} /> HIỂU THÊM QUA CÂU HỎI
@@ -1011,7 +1037,7 @@ export default function LearningApp() {
                     id="panel-quiz"
                     tabIndex={-1}
                     aria-labelledby="quiz"
-                    hidden={resource !== "ai" || readerMode !== "quiz"}
+                    hidden={readerMode !== "quiz"}
                   >
                     <span className="eyebrow green">ÔN LẠI ĐIỀU VỪA HỌC</span>
                     <h2 id="quiz" tabIndex={-1}>
@@ -1131,46 +1157,118 @@ export default function LearningApp() {
                     </button>
                   </nav>
                 </div>
+                <aside className="book-outline" aria-label="Mục lục sách">
+                  <button
+                    className="inline-link"
+                    onClick={() => navigate("home")}
+                  >
+                    ← Kho học liệu
+                  </button>
+                  <h2 id="book-navigation" tabIndex={-1}>
+                    Mục lục sách
+                  </h2>
+                  <p className="outline-caption">
+                    {course.subject} {course.grade} · Kết nối tri thức
+                  </p>
+                  <nav aria-label="Các bài trong sách">
+                    {[...new Set(syllabus.map((l) => l.chapter))].map(
+                      (chapter) => (
+                        <details
+                          key={chapter}
+                          open={chapter === lesson.chapter}
+                        >
+                          <summary>{chapter}</summary>
+                          {syllabus
+                            .filter((l) => l.chapter === chapter)
+                            .map((l) => (
+                              <button
+                                key={l.id}
+                                className="outline-lesson"
+                                aria-current={
+                                  l.id === lesson.id ? "page" : undefined
+                                }
+                                onClick={() => {
+                                  if (l.id !== lesson.id) openLesson(l);
+                                }}
+                              >
+                                {lessonLabel(l)}
+                              </button>
+                            ))}
+                        </details>
+                      ),
+                    )}
+                  </nav>
+                </aside>
                 <aside
                   className="learning-options"
-                  aria-label="Cách học bài này"
+                  aria-label="Tài liệu bổ sung và mục lục bài"
                 >
-                  <h2>Cách học bài này</h2>
-                  {(
-                    [
-                      {
-                        id: "youtube",
-                        icon: "video",
-                        title: "Bài giảng YouTube",
-                        description: "Xem video theo bài",
-                      },
-                      {
-                        id: "paper",
-                        icon: "book",
-                        title: "Bài giảng giấy",
-                        description: "Đọc và nghe nội dung",
-                      },
-                      {
-                        id: "ai",
-                        icon: "spark",
-                        title: "Bài giảng tương tác AI",
-                        description: "Hỏi đáp và luyện tập · Demo",
-                      },
-                    ] as const
-                  ).map((item) => (
-                    <button
-                      key={item.id}
-                      className="resource-choice"
-                      aria-pressed={resource === item.id}
-                      onClick={() => chooseResource(item.id)}
+                  <h2 id="lesson-resources" tabIndex={-1}>
+                    Tài liệu bổ sung
+                  </h2>
+                  <details className="supplement-video">
+                    <summary>
+                      Video YouTube ·{" "}
+                      {lesson.youtubeVideoId ? "Tham khảo" : "Chưa có video"}
+                    </summary>
+
+                    <section
+                      id="panel-youtube"
+                      tabIndex={-1}
+                      aria-label="Bài giảng YouTube"
+                      className="resource-panel"
                     >
-                      <Icon name={item.icon} size={24} />
-                      <span>
-                        <strong>{item.title}</strong>
-                        <small>{item.description}</small>
-                      </span>
-                    </button>
-                  ))}
+                      <h2>Bài giảng YouTube</h2>
+                      {lesson.transcript ? (
+                        <details className="video-transcript">
+                          <summary>Đọc bản chép lời và mô tả video</summary>
+                          <p className="paragraph-text">{lesson.transcript}</p>
+                        </details>
+                      ) : (
+                        <p className="source-note">
+                          Video tham khảo chưa có bản chép lời và mô tả hình ảnh
+                          được kiểm tra.
+                        </p>
+                      )}
+                      {lesson.youtubeVideoId &&
+                      /^[a-zA-Z0-9_-]{11}$/.test(lesson.youtubeVideoId) ? (
+                        <>
+                          {lesson.youtubeSource && (
+                            <p>{lesson.youtubeSource}</p>
+                          )}
+                          <iframe
+                            className="lesson-video"
+                            src={`https://www.youtube-nocookie.com/embed/${lesson.youtubeVideoId}`}
+                            title={`Video bài giảng: ${lesson.title}`}
+                            allowFullScreen
+                            allow="encrypted-media; picture-in-picture"
+                          />
+                          <a
+                            href={`https://www.youtube.com/watch?v=${lesson.youtubeVideoId}`}
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            Mở video trên YouTube ↗
+                          </a>
+                        </>
+                      ) : (
+                        <>
+                          <p>
+                            Chưa có video được gắn cho bài này. Bạn có thể tìm
+                            bài giảng theo đúng tên bài và bộ sách.
+                          </p>
+                          <a
+                            className="secondary"
+                            href={`https://www.youtube.com/results?search_query=${encodeURIComponent(`${lesson.subject} ${lesson.grade} Kết nối tri thức ${lessonLabel(lesson)}`)}`}
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            Tìm bài giảng trên YouTube ↗
+                          </a>
+                        </>
+                      )}
+                    </section>
+                  </details>
                   {lesson.sections.length > 0 && (
                     <nav className="section-outline" aria-label="Trong bài này">
                       <h3>Trong bài này</h3>
@@ -1202,11 +1300,13 @@ export default function LearningApp() {
           )}
           {view === "teacher" && user.role === "Giáo viên" && (
             <>
-              <div className="notice">
-                Bản nháp được lưu riêng với bài đang công bố. “Công bố” chỉ thay
-                đổi dữ liệu trên thiết bị; không chứng nhận nội dung đã được
-                chuyên gia duyệt.
-              </div>
+              {!editor && (
+                <div className="notice">
+                  Bản nháp được lưu riêng với bài đang công bố. “Công bố” chỉ
+                  thay đổi dữ liệu trên thiết bị; không chứng nhận nội dung đã
+                  được chuyên gia duyệt.
+                </div>
+              )}
               {!editor ? (
                 <>
                   {lessons.map((l) => (
@@ -1214,10 +1314,10 @@ export default function LearningApp() {
                       <div>
                         <span className="eyebrow">
                           {l.status === "published"
-                            ? "ĐÃ CÔNG BỐ · DEMO"
-                            : "BẢN NHÁP"}
+                            ? contentLabel(l)
+                            : "Bản nháp"}
                         </span>
-                        <h2>{l.title}</h2>
+                        <h2>{lessonLabel(l)}</h2>
                         {workspace.drafts[l.id] && (
                           <p>
                             Có bản nháp riêng · lưu{" "}
@@ -1245,6 +1345,7 @@ export default function LearningApp() {
                       </div>
                       <button
                         className="secondary"
+                        aria-label={`Biên tập: ${lessonLabel(l)}`}
                         onClick={() => {
                           setEditor(
                             structuredClone(

@@ -2,7 +2,13 @@
 import { sectionText } from "../services/content";
 import type { RefObject } from "react";
 import type { Lesson } from "../data/lessons";
-import { normalize, searchLessons } from "../services/learning";
+import {
+  normalize,
+  searchLessons,
+  titleMatches,
+  hasReading,
+  contentLabel,
+} from "../services/learning";
 import { courseLessons, lessonLabel, type Course } from "./course-picker";
 
 type Props = {
@@ -11,6 +17,8 @@ type Props = {
   ready: boolean;
   query: string;
   onQuery: (value: string) => void;
+  all: boolean;
+  setAll: (value: boolean) => void;
   onOpen: (lesson: Lesson, sectionId?: string) => void;
   headingRef: RefObject<HTMLHeadingElement | null>;
 };
@@ -20,12 +28,19 @@ export default function HomePage({
   ready,
   query,
   onQuery,
+  all,
+  setAll,
   onOpen,
   headingRef,
 }: Props) {
   const available = courseLessons(lessons, course);
-  const visible = searchLessons(available, query);
-  const chapters = [...new Set(visible.map((l) => l.chapter))];
+  const visible = searchLessons(available, query).filter(
+    (l) => all || hasReading(l),
+  );
+  const chapters =
+    query.trim() || !all
+      ? ["Kết quả tìm kiếm"]
+      : [...new Set(visible.map((l) => l.chapter))];
   return (
     <div className="repository-page">
       <header className="repository-heading">
@@ -33,7 +48,7 @@ export default function HomePage({
         <h1 ref={headingRef} tabIndex={-1}>
           {course.subject} {course.grade}
         </h1>
-        <p>Chọn bài học, sau đó chọn cách học phù hợp với bạn.</p>
+        <p>Chọn bài để đọc, nghe và luyện tập.</p>
       </header>
       <label className="lesson-search">
         Tìm trong môn học
@@ -41,11 +56,25 @@ export default function HomePage({
           type="search"
           value={query}
           onChange={(e) => onQuery(e.target.value)}
-          placeholder="Tìm tên bài hoặc nội dung…"
+          placeholder="Số bài, tên bài hoặc nội dung…"
         />
       </label>
+      <div className="catalog-filters" aria-label="Phạm vi học liệu">
+        <button aria-pressed={!all} onClick={() => setAll(false)}>
+          Có bài đọc ({available.filter(hasReading).length})
+        </button>
+        <button aria-pressed={all} onClick={() => setAll(true)}>
+          Toàn bộ mục lục ({available.length})
+        </button>
+      </div>
       <div className="repository-list-heading">
-        <h2>Mục lục bài học</h2>
+        <h2>
+          {query.trim()
+            ? "Kết quả tìm kiếm"
+            : all
+              ? "Mục lục trong sách"
+              : "Bài có thể đọc ngay"}
+        </h2>
         <span role="status">
           {ready ? `${visible.length} bài học` : "Đang tải…"}
         </span>
@@ -53,18 +82,19 @@ export default function HomePage({
       {ready &&
         chapters.map((chapter) => (
           <section className="chapter-group" key={chapter}>
-            <h3>{chapter}</h3>
+            {!query.trim() && all && <h3>{chapter}</h3>}
             <ol className="lesson-list">
               {visible
-                .filter((l) => l.chapter === chapter)
+                .filter((l) => !all || !!query.trim() || l.chapter === chapter)
                 .map((l) => {
-                  const matched = query.trim()
-                    ? l.sections.find((s) =>
-                        normalize(s.heading + " " + sectionText(s)).includes(
-                          normalize(query.trim()),
-                        ),
-                      )
-                    : undefined;
+                  const matched =
+                    query.trim() && !titleMatches(l, query)
+                      ? l.sections.find((s) =>
+                          normalize(s.heading + " " + sectionText(s)).includes(
+                            normalize(query.trim()),
+                          ),
+                        )
+                      : undefined;
                   return (
                     <li key={l.id}>
                       <button
@@ -76,11 +106,7 @@ export default function HomePage({
                           <small>
                             {matched
                               ? `Tìm thấy trong: ${matched.heading}`
-                              : l.sections.length
-                                ? l.provenance?.kind === "demo" || !l.provenance
-                                  ? "Có bài đọc mẫu"
-                                  : "Có bài đọc"
-                                : "Chưa có bản đọc trong ứng dụng"}
+                              : contentLabel(l)}
                           </small>
                         </span>
                         <span aria-hidden="true">→</span>
@@ -100,7 +126,7 @@ export default function HomePage({
           </h3>
           <p>
             {available.length
-              ? "Thử một từ khóa khác hoặc xóa nội dung tìm kiếm."
+              ? "Thử từ khóa khác hoặc chọn Toàn bộ mục lục để tìm cả bài chưa có bản đọc."
               : "Chọn môn Lịch sử để xem mục lục lớp 12, bộ Kết nối tri thức."}
           </p>
           {query && (
