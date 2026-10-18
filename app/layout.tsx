@@ -1,5 +1,6 @@
 ﻿import type { Metadata } from "next";
 import "./globals.css";
+import "./study.css";
 export const metadata: Metadata = {
   title: "Kho học liệu số",
   description: "Tra cứu học liệu theo môn học, đọc nội dung và luyện tập.",

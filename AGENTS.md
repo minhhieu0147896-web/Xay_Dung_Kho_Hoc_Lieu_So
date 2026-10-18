@@ -62,3 +62,11 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 - Trên màn hình hẹp, nội dung đứng trước mục lục sách và tài liệu bổ sung cả trong DOM và bố cục. Bộ chọn môn/sách nằm ở kho; bài có lối về đổi bài/môn. Nguồn và nghe toàn bài mở theo nhu cầu.
 - Bài có URL `/?bai=<id>&hoat-dong=ask|quiz#<nguon>` (đọc bỏ hoat-dong); nút tiến/lùi và tải lại khôi phục vị trí. Cờ phiên demo trong sessionStorage chỉ giữ trạng thái giao diện, không phải xác thực.
 - Biên tập theo từng mục; tách Nội dung / Nguồn & nhập tệp / Luyện tập / Video. Nút lưu nháp ở thanh trên bám khi cuộn; bảng nhập từng ô. Giữ nguyên mã nguồn, cơ chế nháp/công bố và dữ liệu cũ.
+
+### Cập nhật 13/10/2026: tham khảo cách tổ chức học tập của PREP
+
+- Người dùng yêu cầu áp dụng cách tổ chức giao diện học và video của PREP vào dự án. Tham khảo hướng dẫn công khai về Lesson/Section/tiến độ; đây là bố cục điều chỉnh cho kho học liệu, không phải bản sao màn hình khóa học riêng của PREP.
+- Trang học dùng hai cột: video lớn và nội dung chính bên trái, mục lục môn học và tiến độ đọc/luyện tập bên phải. Trên điện thoại xếp nội dung trước mục lục. Thay cách đặt video nhỏ ở cột phải của bản 08/10.
+- Giữ ba hoạt động Đọc bài / Hỏi đáp / Luyện tập dưới video, có lối tắt Tới bài đọc. Video không tự phát; thu gọn tháo trình phát để dừng âm thanh. Khi nghe bài bằng TTS, ngắt video để tránh hai nguồn âm thanh.
+- Chỉ dùng video gắn sẵn trong học liệu, hiện nguồn và trạng thái bản chép lời. Không đưa video/nội dung khóa học PREP vào dự án; không tự ghi nhận tiến độ xem video hay khóa bài theo thời lượng xem.
+- Kho thêm bộ lọc Có video bên cạnh Có bài đọc và Toàn bộ mục lục; giữ bộ lọc khi chuyển qua lại trong phiên. Mô tả triển khai và kiểm chứng nằm ở `docs/study-workspace-2026-10-13.md`.

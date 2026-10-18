@@ -1,0 +1,319 @@
+/* Video-led learning workspace. Keep the lesson before navigation in source order. */
+.study-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 340px;
+  align-items: start;
+  max-width: 1440px;
+  margin: auto;
+  color: var(--ink);
+}
+.study-content {
+  min-width: 0;
+  padding: 28px 36px 48px;
+}
+.study-content .lesson-heading h1 {
+  font-size: 1.65em;
+  margin: 8px 0;
+}
+.study-content .lesson-heading {
+  margin-bottom: 24px;
+}
+.study-content .reader-shortcuts {
+  margin-bottom: 12px;
+}
+.study-video-heading,
+.study-video-source,
+.study-progress-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.study-video-heading {
+  margin-bottom: 12px;
+}
+.study-video-heading h2 {
+  font-size: 1em;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.study-video-heading h2 span {
+  font-size: 0.75em;
+  font-weight: 400;
+  color: var(--muted);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 2px 7px;
+}
+.study-video-heading button {
+  font-size: 0.875em;
+  min-height: 40px;
+}
+.study-player {
+  aspect-ratio: 16 / 9;
+  background: #111b2c;
+  border-radius: 10px;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+}
+.study-player iframe {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+.study-player p {
+  color: #fff;
+  padding: 28px;
+  max-width: 520px;
+  text-align: center;
+}
+.study-video-source {
+  padding: 12px 0 8px;
+  color: var(--muted);
+  font-size: 0.8125em;
+}
+.study-video-source a {
+  padding: 4px 0;
+}
+.study-transcript {
+  font-size: 0.875em;
+  color: var(--muted);
+}
+.study-transcript summary {
+  cursor: pointer;
+  padding: 8px 0;
+}
+.study-transcript p {
+  padding: 12px 0;
+  line-height: 1.75;
+}
+.study-video-empty {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 18px 0;
+  border-block: 1px solid var(--border);
+}
+.study-video-empty > span {
+  font-size: 2em;
+  color: var(--green);
+}
+.study-video-empty p {
+  font-size: 0.875em;
+  color: var(--muted);
+  margin-top: 4px;
+}
+.study-content .reader-navigation {
+  margin: 20px 0;
+  gap: 24px;
+}
+.study-content .reader-navigation button[aria-pressed="true"] {
+  border-bottom: 3px solid var(--green);
+  font-weight: 700;
+}
+.study-content :is(#panel-read, #panel-ask, #panel-quiz) {
+  scroll-margin-top: 16px;
+}
+.study-outline {
+  min-width: 0;
+  border-left: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  max-height: 100dvh;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  background: var(--paper);
+}
+.study-outline-heading {
+  padding: 28px 24px 20px;
+}
+.study-outline-heading h2 {
+  font-size: 1.15em;
+  margin: 8px 0;
+}
+.study-outline-heading > p:last-child {
+  font-size: 0.8125em;
+  color: var(--muted);
+}
+.study-current {
+  padding: 20px 24px;
+  border-block: 1px solid var(--border);
+}
+.study-progress-label h3 {
+  font-size: 0.9375em;
+}
+.study-progress-label > span {
+  color: var(--green);
+  font-weight: 700;
+}
+.study-current progress {
+  display: block;
+  width: 100%;
+  height: 6px;
+  margin: 12px 0 6px;
+}
+.study-progress-help {
+  color: var(--muted);
+  font-size: 0.75em;
+}
+.study-current nav {
+  margin-top: 16px;
+}
+.study-current a {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  text-decoration: none;
+  color: var(--ink);
+  font-size: 0.875em;
+  padding: 10px 0;
+}
+.study-current a:hover {
+  color: var(--green);
+  text-decoration: underline;
+}
+.section-step {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  font-size: 0.8em;
+}
+.section-step.done {
+  color: var(--green);
+  background: var(--soft);
+  border-color: var(--green);
+}
+.study-current a small {
+  display: block;
+  color: var(--green);
+}
+.study-syllabus details {
+  border-bottom: 1px solid var(--border);
+}
+.study-syllabus summary {
+  padding: 18px 24px;
+  font-size: 0.8125em;
+  font-weight: 600;
+  line-height: 1.65;
+  cursor: pointer;
+}
+.study-syllabus summary:focus-visible,
+.study-transcript summary:focus-visible {
+  outline: 3px solid #175cd3;
+  outline-offset: -3px;
+}
+.study-lesson {
+  width: 100%;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  text-align: left;
+  padding: 16px 20px;
+  background: transparent;
+  color: var(--ink);
+  border-left: 3px solid transparent;
+}
+.study-lesson[aria-current="page"] {
+  background: var(--soft);
+  border-left-color: var(--green);
+  color: var(--green);
+}
+.study-lesson-number {
+  font-size: 0.8125em;
+  padding-top: 1px;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+}
+.study-lesson strong {
+  display: block;
+  font-size: 0.875em;
+  font-weight: 500;
+  line-height: 1.6;
+}
+.study-lesson small {
+  display: block;
+  color: var(--muted);
+  font-size: 0.75em;
+  line-height: 1.6;
+  margin-top: 4px;
+}
+.study-lesson[aria-current="page"] strong {
+  font-weight: 700;
+}
+.catalog-lesson-number {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  background: var(--soft);
+  color: var(--green);
+  border-radius: 8px;
+  font-weight: 600;
+}
+.catalog-lesson-info {
+  flex: 1;
+  min-width: 0;
+}
+@media (max-width: 1100px) {
+  .study-layout {
+    grid-template-columns: minmax(0, 1fr) 300px;
+  }
+  .study-content {
+    padding: 24px;
+  }
+}
+@media (max-width: 900px) {
+  .study-layout {
+    display: block;
+  }
+  .study-outline {
+    position: static;
+    max-height: none;
+    overflow: visible;
+    border-left: 0;
+    border-top: 1px solid var(--border);
+  }
+  .study-content {
+    padding: 20px;
+  }
+  .study-content .lesson-heading h1 {
+    font-size: 1.5em;
+  }
+  .study-content .reader-navigation {
+    gap: 12px;
+  }
+  .study-content .reader-shortcuts {
+    gap: 4px 16px;
+  }
+  .study-content .lesson-heading {
+    margin-bottom: 16px;
+  }
+  .study-player {
+    border-radius: 6px;
+  }
+}
+@media (max-width: 400px) {
+  .study-content {
+    padding: 16px;
+  }
+  .study-video-heading {
+    gap: 4px;
+  }
+  .lesson-row {
+    gap: 12px;
+  }
+  .catalog-lesson-number {
+    width: 36px;
+    height: 36px;
+  }
+}

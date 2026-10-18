@@ -7,6 +7,7 @@ import {
   searchLessons,
   titleMatches,
   hasReading,
+  hasVideo,
   contentLabel,
 } from "../services/learning";
 import { courseLessons, lessonLabel, type Course } from "./course-picker";
@@ -17,8 +18,8 @@ type Props = {
   ready: boolean;
   query: string;
   onQuery: (value: string) => void;
-  all: boolean;
-  setAll: (value: boolean) => void;
+  filter: "read" | "video" | "all";
+  onFilter: (value: "read" | "video" | "all") => void;
   onOpen: (lesson: Lesson, sectionId?: string) => void;
   headingRef: RefObject<HTMLHeadingElement | null>;
 };
@@ -28,14 +29,15 @@ export default function HomePage({
   ready,
   query,
   onQuery,
-  all,
-  setAll,
+  filter,
+  onFilter,
   onOpen,
   headingRef,
 }: Props) {
+  const all = filter === "all";
   const available = courseLessons(lessons, course);
   const visible = searchLessons(available, query).filter(
-    (l) => all || hasReading(l),
+    (l) => all || (filter === "video" ? hasVideo(l) : hasReading(l)),
   );
   const chapters =
     query.trim() || !all
@@ -60,10 +62,19 @@ export default function HomePage({
         />
       </label>
       <div className="catalog-filters" aria-label="Phạm vi học liệu">
-        <button aria-pressed={!all} onClick={() => setAll(false)}>
+        <button
+          aria-pressed={filter === "read"}
+          onClick={() => onFilter("read")}
+        >
           Có bài đọc ({available.filter(hasReading).length})
         </button>
-        <button aria-pressed={all} onClick={() => setAll(true)}>
+        <button
+          aria-pressed={filter === "video"}
+          onClick={() => onFilter("video")}
+        >
+          Có video ({available.filter(hasVideo).length})
+        </button>
+        <button aria-pressed={all} onClick={() => onFilter("all")}>
           Toàn bộ mục lục ({available.length})
         </button>
       </div>
@@ -73,7 +84,9 @@ export default function HomePage({
             ? "Kết quả tìm kiếm"
             : all
               ? "Mục lục trong sách"
-              : "Bài có thể đọc ngay"}
+              : filter === "video"
+                ? "Bài học qua video"
+                : "Bài có thể đọc ngay"}
         </h2>
         <span role="status">
           {ready ? `${visible.length} bài học` : "Đang tải…"}
@@ -101,12 +114,26 @@ export default function HomePage({
                         className="lesson-row"
                         onClick={() => onOpen(l, matched?.id)}
                       >
-                        <span>
+                        <span
+                          className="catalog-lesson-number"
+                          aria-hidden="true"
+                        >
+                          {String(l.textbook?.lessonNumber ?? "").padStart(
+                            2,
+                            "0",
+                          )}
+                        </span>
+                        <span className="catalog-lesson-info">
                           <strong>{lessonLabel(l)}</strong>
                           <small>
                             {matched
                               ? `Tìm thấy trong: ${matched.heading}`
                               : contentLabel(l)}
+                            {hasVideo(l) &&
+                              hasReading(l) &&
+                              " · Video tham khảo"}
+                            {l.questions.length > 0 &&
+                              ` · ${l.questions.length} câu luyện tập`}
                           </small>
                         </span>
                         <span aria-hidden="true">→</span>

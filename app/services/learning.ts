@@ -19,14 +19,15 @@ export function titleMatches(lesson: Lesson, query: string) {
 export function hasReading(lesson: Lesson) {
   return lesson.sections.some((s) => sectionText(s).trim().length > 0);
 }
+export function hasVideo(lesson: Lesson) {
+  return /^[a-zA-Z0-9_-]{11}$/.test(lesson.youtubeVideoId ?? "");
+}
 export function contentLabel(lesson: Lesson) {
   if (hasReading(lesson))
     return lesson.provenance?.kind === "demo" || !lesson.provenance
       ? "Bài đọc mẫu"
       : "Có bài đọc";
-  return /^[\w-]{11}$/.test(lesson.youtubeVideoId ?? "")
-    ? "Chỉ có video tham khảo"
-    : "Chưa nhập nội dung";
+  return hasVideo(lesson) ? "Chỉ có video tham khảo" : "Chưa nhập nội dung";
 }
 export function searchLessons(lessons: Lesson[], query: string) {
   const term = normalize(query.trim());

@@ -2,6 +2,8 @@
 
 import { useEffect, useEffectEvent, useRef, useState } from "react";
 import HomePage from "./home-page";
+import LessonVideo from "./lesson-video";
+import StudyOutline from "./study-outline";
 import CoursePicker, {
   defaultCourse,
   courseLessons,
@@ -92,7 +94,9 @@ export default function LearningApp() {
   const [large, setLarge] = useState(false);
   const [contrast, setContrast] = useState(false);
   const [query, setQuery] = useState("");
-  const [showAllLessons, setShowAllLessons] = useState(false);
+  const [catalogFilter, setCatalogFilter] = useState<"read" | "video" | "all">(
+    "read",
+  );
   const [selected, setSelected] = useState(initialLessons[0].id);
   const [logs, setLogs] = useState<string[]>([]);
   const [notice, setNotice] = useState("");
@@ -157,6 +161,23 @@ export default function LearningApp() {
         );
       }
       setAllProgress(readStored("suhoc-progress-v1", {}));
+      try {
+        const catalog = JSON.parse(
+          sessionStorage.getItem("suhoc-catalog-view-v1") ?? "null",
+        );
+        if (catalog && ["read", "video", "all"].includes(catalog.filter)) {
+          setCatalogFilter(catalog.filter);
+          if (typeof catalog.query === "string") setQuery(catalog.query);
+          if (
+            typeof catalog.course?.subject === "string" &&
+            typeof catalog.course?.grade === "number" &&
+            typeof catalog.course?.book === "string"
+          )
+            setCourse(catalog.course);
+        }
+      } catch {
+        /* Keep defaults if this optional view preference cannot be read. */
+      }
       setLogs(readStored("suhoc-logs-v1", []));
       const savedUser = readStored("suhoc-user-v1", "student-1");
       if (users.some((u) => u.id === savedUser)) setUserId(savedUser);
@@ -180,6 +201,17 @@ export default function LearningApp() {
       if ("speechSynthesis" in window) window.speechSynthesis.cancel();
     };
   }, []);
+  useEffect(() => {
+    if (!ready) return;
+    try {
+      sessionStorage.setItem(
+        "suhoc-catalog-view-v1",
+        JSON.stringify({ filter: catalogFilter, query, course }),
+      );
+    } catch {
+      /* The catalogue still works in memory when storage is unavailable. */
+    }
+  }, [ready, catalogFilter, query, course]);
   function updateUrl(next: View, id = selected, mode = "read", sectionId = "") {
     const params = new URLSearchParams();
     if (next === "reader") {
@@ -379,7 +411,7 @@ export default function LearningApp() {
   function changeCourse(next: Course) {
     setCourse(next);
     setQuery("");
-    setShowAllLessons(false);
+    setCatalogFilter("read");
     navigate("home");
   }
   function saveProgress(update: Partial<Progress>) {
@@ -617,8 +649,8 @@ export default function LearningApp() {
               ready={ready}
               query={query}
               onQuery={setQuery}
-              all={showAllLessons}
-              setAll={setShowAllLessons}
+              filter={catalogFilter}
+              onFilter={setCatalogFilter}
               onOpen={openLesson}
               headingRef={headingRef}
             />
@@ -746,8 +778,8 @@ export default function LearningApp() {
           )}
           {view === "reader" && (
             <>
-              <div className="textbook-layout">
-                <div className="reading-body">
+              <div className="study-layout">
+                <div className="reading-body study-content">
                   <header className="lesson-heading">
                     <div className="reader-shortcuts">
                       <button
@@ -756,8 +788,13 @@ export default function LearningApp() {
                       >
                         ← Đổi bài / môn
                       </button>
-                      <a href="#book-navigation">Mục lục sách</a>
-                      <a href="#lesson-resources">Video</a>
+                      <a href="#book-navigation">Danh sách bài</a>
+                      <button
+                        className="inline-link"
+                        onClick={() => switchReader("read")}
+                      >
+                        Tới bài đọc ↓
+                      </button>
                     </div>
                     <p className="eyebrow">
                       {lesson.subject} {lesson.grade} / Bài{" "}
@@ -768,6 +805,11 @@ export default function LearningApp() {
                     </h1>
                     <p>{lesson.textbook?.title}</p>
                   </header>
+                  <LessonVideo
+                    key={lesson.id}
+                    lesson={lesson}
+                    audioActive={speech !== "stopped"}
+                  />
                   <nav
                     className="reader-navigation"
                     aria-label="Hoạt động trong bài học"
@@ -1157,144 +1199,14 @@ export default function LearningApp() {
                     </button>
                   </nav>
                 </div>
-                <aside className="book-outline" aria-label="Mục lục sách">
-                  <button
-                    className="inline-link"
-                    onClick={() => navigate("home")}
-                  >
-                    ← Kho học liệu
-                  </button>
-                  <h2 id="book-navigation" tabIndex={-1}>
-                    Mục lục sách
-                  </h2>
-                  <p className="outline-caption">
-                    {course.subject} {course.grade} · Kết nối tri thức
-                  </p>
-                  <nav aria-label="Các bài trong sách">
-                    {[...new Set(syllabus.map((l) => l.chapter))].map(
-                      (chapter) => (
-                        <details
-                          key={chapter}
-                          open={chapter === lesson.chapter}
-                        >
-                          <summary>{chapter}</summary>
-                          {syllabus
-                            .filter((l) => l.chapter === chapter)
-                            .map((l) => (
-                              <button
-                                key={l.id}
-                                className="outline-lesson"
-                                aria-current={
-                                  l.id === lesson.id ? "page" : undefined
-                                }
-                                onClick={() => {
-                                  if (l.id !== lesson.id) openLesson(l);
-                                }}
-                              >
-                                {lessonLabel(l)}
-                              </button>
-                            ))}
-                        </details>
-                      ),
-                    )}
-                  </nav>
-                </aside>
-                <aside
-                  className="learning-options"
-                  aria-label="Tài liệu bổ sung và mục lục bài"
-                >
-                  <h2 id="lesson-resources" tabIndex={-1}>
-                    Tài liệu bổ sung
-                  </h2>
-                  <details className="supplement-video">
-                    <summary>
-                      Video YouTube ·{" "}
-                      {lesson.youtubeVideoId ? "Tham khảo" : "Chưa có video"}
-                    </summary>
-
-                    <section
-                      id="panel-youtube"
-                      tabIndex={-1}
-                      aria-label="Bài giảng YouTube"
-                      className="resource-panel"
-                    >
-                      <h2>Bài giảng YouTube</h2>
-                      {lesson.transcript ? (
-                        <details className="video-transcript">
-                          <summary>Đọc bản chép lời và mô tả video</summary>
-                          <p className="paragraph-text">{lesson.transcript}</p>
-                        </details>
-                      ) : (
-                        <p className="source-note">
-                          Video tham khảo chưa có bản chép lời và mô tả hình ảnh
-                          được kiểm tra.
-                        </p>
-                      )}
-                      {lesson.youtubeVideoId &&
-                      /^[a-zA-Z0-9_-]{11}$/.test(lesson.youtubeVideoId) ? (
-                        <>
-                          {lesson.youtubeSource && (
-                            <p>{lesson.youtubeSource}</p>
-                          )}
-                          <iframe
-                            className="lesson-video"
-                            src={`https://www.youtube-nocookie.com/embed/${lesson.youtubeVideoId}`}
-                            title={`Video bài giảng: ${lesson.title}`}
-                            allowFullScreen
-                            allow="encrypted-media; picture-in-picture"
-                          />
-                          <a
-                            href={`https://www.youtube.com/watch?v=${lesson.youtubeVideoId}`}
-                            target="_blank"
-                            rel="noreferrer"
-                          >
-                            Mở video trên YouTube ↗
-                          </a>
-                        </>
-                      ) : (
-                        <>
-                          <p>
-                            Chưa có video được gắn cho bài này. Bạn có thể tìm
-                            bài giảng theo đúng tên bài và bộ sách.
-                          </p>
-                          <a
-                            className="secondary"
-                            href={`https://www.youtube.com/results?search_query=${encodeURIComponent(`${lesson.subject} ${lesson.grade} Kết nối tri thức ${lessonLabel(lesson)}`)}`}
-                            target="_blank"
-                            rel="noreferrer"
-                          >
-                            Tìm bài giảng trên YouTube ↗
-                          </a>
-                        </>
-                      )}
-                    </section>
-                  </details>
-                  {lesson.sections.length > 0 && (
-                    <nav className="section-outline" aria-label="Trong bài này">
-                      <h3>Trong bài này</h3>
-                      {lesson.sections.map((section, i) => (
-                        <a
-                          key={section.id}
-                          href={`#${section.id}`}
-                          onClick={(e) => {
-                            e.preventDefault();
-                            jump(section.id);
-                          }}
-                        >
-                          {i + 1}. {section.heading}
-                        </a>
-                      ))}
-                      <div className="toc-progress">
-                        <span>Đã học {percent(lesson)}%</span>
-                        <progress
-                          value={percent(lesson)}
-                          max={100}
-                          aria-label="Tiến độ bài học"
-                        />
-                      </div>
-                    </nav>
-                  )}
-                </aside>
+                <StudyOutline
+                  lessons={syllabus}
+                  lesson={lesson}
+                  progress={currentProgress}
+                  percent={percent(lesson)}
+                  onOpen={openLesson}
+                  onJump={jump}
+                />
               </div>
             </>
           )}
