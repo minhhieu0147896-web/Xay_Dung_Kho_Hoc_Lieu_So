@@ -1,5 +1,42 @@
 import { blocksOf, blockText, sectionText } from "./content.ts";
-import type { Answer, Lesson } from "../data/lessons";
+import type { Answer, Lesson, Progress } from "../data/lessons";
+export function lessonProgressSummary(lesson: Lesson, progress?: Progress) {
+  const totalSections = lesson.sections.length;
+  const completedSections = lesson.sections.filter((s) =>
+    progress?.completedSectionIds.includes(s.id),
+  ).length;
+  const totalQuestions = lesson.questions.length;
+  const quizDone = totalQuestions > 0 && progress?.quizScore !== undefined;
+  const totalSteps = totalSections + (totalQuestions > 0 ? 1 : 0);
+  const completedSteps = completedSections + (quizDone ? 1 : 0);
+  const percent =
+    totalSteps > 0 ? Math.round((completedSteps / totalSteps) * 100) : 0;
+  const state: "completed" | "in_progress" | "not_started" =
+    totalSteps > 0 && completedSteps === totalSteps
+      ? "completed"
+      : completedSteps > 0
+        ? "in_progress"
+        : "not_started";
+  const parts: string[] = [];
+  if (totalSections > 0 && (completedSections > 0 || quizDone))
+    parts.push(`Đã đọc ${completedSections}/${totalSections} mục`);
+  if (quizDone) parts.push(`Luyện tập ${progress?.quizScore}/${totalQuestions}`);
+  return {
+    totalSections,
+    completedSections,
+    totalQuestions,
+    quizScore: progress?.quizScore,
+    quizDone,
+    percent,
+    state,
+    label:
+      state === "completed"
+        ? `Đã hoàn thành (${parts.join(" · ")})`
+        : state === "in_progress"
+          ? `Đang học: ${parts.join(" · ")}`
+          : "",
+  };
+}
 export function normalize(value: string) {
   return value
     .normalize("NFD")

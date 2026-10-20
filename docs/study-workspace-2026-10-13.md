@@ -13,14 +13,16 @@ Chưa truy cập màn hình khóa học riêng sau đăng nhập. Bố cục vid
 - Thu gọn loại bỏ iframe để dừng phát. Khi TTS đọc nội dung, iframe được thay bằng thông báo để tránh chồng tiếng. Mở lại video không giữ thời điểm đang xem.
 - Bản chép lời ở ngay dưới video; nếu thiếu thì ghi rõ, không dùng bài đọc mẫu để giả làm bản chép lời.
 - Ba hoạt động Đọc bài / Hỏi đáp / Luyện tập giữ nguyên dữ liệu trong cùng bài. Lối tắt Tới bài đọc giúp bỏ qua video bằng bàn phím.
-- Mục lục bên phải cho biết bài đang học, từng mục đã đọc, tiến độ đọc/luyện tập thật, các bài theo chủ đề và trạng thái nội dung. Tiến độ không tính thời gian xem video.
-- Kho thêm bộ lọc Có video; mỗi dòng có số bài và loại học liệu. Bài chưa gắn video dùng thông báo gọn, không hiện khung phát giả.
+- Mục lục bên phải cho biết bài đang học, từng mục đã đọc, chi tiết số mục đã đọc và kết quả luyện tập thật, cùng trạng thái hoàn thành (`✓` / đang học) trên từng bài trong danh sách chủ đề. Tiến độ không tính thời gian xem video.
+- Kho thêm bộ lọc Có video; mỗi dòng hiển thị số bài (hoặc dấu `✓` khi đã hoàn thành), loại học liệu và trạng thái tiến độ đọc/luyện tập của người học. Bài chưa gắn video dùng thông báo gọn, không hiện khung phát giả.
+- Cuối mục Đọc bài có khối Bước tiếp theo tóm tắt số mục đã đọc và lối chuyển nhanh sang Luyện tập hoặc Hỏi đáp theo đoạn nguồn mà không cần cuộn ngược lên đầu trang.
+- Mục Luyện tập có bảng danh sách câu hỏi (Question Palette) hiển thị số câu đã chọn đáp án, trạng thái từng câu (chưa chọn / đã chọn / đúng / chưa chính xác sau khi nộp) và cho phép nhảy trực tiếp tới từng câu bằng bàn phím hoặc chuột.
 - Không đổi dữ liệu SGK, mã nguồn trích dẫn, dữ liệu cục bộ hoặc luồng biên tập.
 
 ## Kiểm chứng
 
 - Lint, TypeScript qua bước build, và build thành công.
-- 17/17 kiểm tra dữ liệu/API thành công với máy chủ phát triển.
+- 18/18 kiểm tra dữ liệu/API thành công với máy chủ phát triển (bao gồm kiểm tra `lessonProgressSummary`).
 - Đã phát video Bài 6 trong trình duyệt; xác nhận thu gọn gỡ iframe, bật TTS hiện trạng thái dừng video.
 - Đã thử bộ lọc video (2 bài), bài 10 không có video, giữ câu hỏi và đáp án khi chuyển hoạt động, mở đúng đoạn trích dẫn.
 - Đã xem màn hình 390 px và kiểm tra 320 px với chữ lớn 25 px: không tràn ngang trang. Lối tắt bài đọc chuyển focus vào vùng đọc; nút thu gọn dùng được bằng Enter.

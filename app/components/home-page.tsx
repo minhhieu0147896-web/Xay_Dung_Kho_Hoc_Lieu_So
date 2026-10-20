@@ -1,7 +1,7 @@
 "use client";
 import { sectionText } from "../services/content";
 import type { RefObject } from "react";
-import type { Lesson } from "../data/lessons";
+import type { Lesson, Progress } from "../data/lessons";
 import {
   normalize,
   searchLessons,
@@ -9,12 +9,14 @@ import {
   hasReading,
   hasVideo,
   contentLabel,
+  lessonProgressSummary,
 } from "../services/learning";
 import { courseLessons, lessonLabel, type Course } from "./course-picker";
 
 type Props = {
   lessons: Lesson[];
   course: Course;
+  progress?: Record<string, Progress>;
   ready: boolean;
   query: string;
   onQuery: (value: string) => void;
@@ -26,6 +28,7 @@ type Props = {
 export default function HomePage({
   lessons,
   course,
+  progress = {},
   ready,
   query,
   onQuery,
@@ -108,6 +111,7 @@ export default function HomePage({
                           ),
                         )
                       : undefined;
+                  const summary = lessonProgressSummary(l, progress[l.id]);
                   return (
                     <li key={l.id}>
                       <button
@@ -115,13 +119,15 @@ export default function HomePage({
                         onClick={() => onOpen(l, matched?.id)}
                       >
                         <span
-                          className="catalog-lesson-number"
+                          className={`catalog-lesson-number ${summary.state === "completed" ? "done" : summary.state === "in_progress" ? "in-progress" : ""}`}
                           aria-hidden="true"
                         >
-                          {String(l.textbook?.lessonNumber ?? "").padStart(
-                            2,
-                            "0",
-                          )}
+                          {summary.state === "completed"
+                            ? "✓"
+                            : String(l.textbook?.lessonNumber ?? "").padStart(
+                                2,
+                                "0",
+                              )}
                         </span>
                         <span className="catalog-lesson-info">
                           <strong>{lessonLabel(l)}</strong>
@@ -134,6 +140,7 @@ export default function HomePage({
                               " · Video tham khảo"}
                             {l.questions.length > 0 &&
                               ` · ${l.questions.length} câu luyện tập`}
+                            {summary.label && ` · ${summary.label}`}
                           </small>
                         </span>
                         <span aria-hidden="true">→</span>

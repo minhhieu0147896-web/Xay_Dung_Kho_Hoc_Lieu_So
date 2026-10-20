@@ -17,6 +17,7 @@ import {
   titleMatches,
   hasReading,
   contentLabel,
+  lessonProgressSummary,
 } from "../app/services/learning.ts";
 
 test("number searches match exact textbook lesson and title matches start at the beginning", () => {
@@ -206,4 +207,32 @@ test("search and retrieval use block content and cite the matching paragraph", (
     }),
     "Bảng mẫu\nNơi: Hà Nội; Ngày: 19/8",
   );
+});
+test("lessonProgressSummary computes not_started, in_progress and completed states accurately", () => {
+  const lesson = sample();
+  assert.deepEqual(lessonProgressSummary(lesson), {
+    totalSections: 3,
+    completedSections: 0,
+    totalQuestions: 3,
+    quizScore: undefined,
+    quizDone: false,
+    percent: 0,
+    state: "not_started",
+    label: "",
+  });
+  const partial = lessonProgressSummary(lesson, {
+    completedSectionIds: ["thang-tam-boi-canh"],
+    updatedAt: "2026-10-19T00:00:00Z",
+  });
+  assert.equal(partial.state, "in_progress");
+  assert.equal(partial.percent, 25);
+  assert.equal(partial.label, "Đang học: Đã đọc 1/3 mục");
+  const full = lessonProgressSummary(lesson, {
+    completedSectionIds: lesson.sections.map((s) => s.id),
+    quizScore: 3,
+    updatedAt: "2026-10-19T00:00:00Z",
+  });
+  assert.equal(full.state, "completed");
+  assert.equal(full.percent, 100);
+  assert.equal(full.label, "Đã hoàn thành (Đã đọc 3/3 mục · Luyện tập 3/3)");
 });

@@ -646,6 +646,7 @@ export default function LearningApp() {
             <HomePage
               lessons={lessons}
               course={course}
+              progress={progress}
               ready={ready}
               query={query}
               onQuery={setQuery}
@@ -991,6 +992,51 @@ export default function LearningApp() {
                         </div>
                       </section>
                     ))}
+                    {lesson.sections.length > 0 && (
+                      <section
+                        className="study-next-step"
+                        aria-label="Bước học tiếp theo"
+                      >
+                        <div>
+                          <span className="eyebrow">BƯỚC TIẾP THEO</span>
+                          <h3>
+                            Đã đọc{" "}
+                            {
+                              lesson.sections.filter((s) =>
+                                currentProgress?.completedSectionIds.includes(
+                                  s.id,
+                                ),
+                              ).length
+                            }
+                            /{lesson.sections.length} mục trong bài
+                          </h3>
+                          <p>
+                            {lesson.questions.length > 0
+                              ? currentProgress?.quizScore !== undefined
+                                ? `Bạn đã hoàn thành luyện tập (${currentProgress.quizScore}/${lesson.questions.length} câu đúng). Bạn có thể ôn lại hoặc hỏi đáp theo đoạn nguồn.`
+                                : `Chuyển sang làm ${lesson.questions.length} câu hỏi luyện tập để kiểm tra mức độ nắm bài.`
+                              : "Bạn có thể chuyển sang mục Hỏi đáp để tra cứu nhanh các đoạn nguồn trong bài."}
+                          </p>
+                        </div>
+                        <div className="study-next-actions">
+                          {lesson.questions.length > 0 && (
+                            <button
+                              className="primary"
+                              onClick={() => switchReader("quiz")}
+                            >
+                              Luyện tập ({lesson.questions.length} câu){" "}
+                              <Icon name="arrow" size={16} />
+                            </button>
+                          )}
+                          <button
+                            className="secondary"
+                            onClick={() => switchReader("ask")}
+                          >
+                            Hỏi đáp theo đoạn nguồn
+                          </button>
+                        </div>
+                      </section>
+                    )}
                   </section>
                   <section
                     className="ask-panel"
@@ -1090,6 +1136,68 @@ export default function LearningApp() {
                         ? `${lesson.questions.length} câu hỏi · Chọn một đáp án cho mỗi câu.`
                         : "Chưa có câu hỏi luyện tập cho bài này."}
                     </p>
+                    {lesson.questions.length > 0 && (
+                      <div
+                        className="quiz-palette"
+                        aria-label="Danh sách câu hỏi"
+                      >
+                        <div className="quiz-palette-status" role="status">
+                          {submitted
+                            ? `Kết quả: đúng ${currentProgress?.quizScore ?? 0}/${lesson.questions.length} câu`
+                            : `Đã chọn ${Object.keys(choices).length}/${lesson.questions.length} câu`}
+                        </div>
+                        <div className="quiz-palette-list">
+                          {lesson.questions.map((q, i) => {
+                            const picked = choices[q.id] !== undefined;
+                            const right =
+                              submitted && choices[q.id] === q.correctOptionId;
+                            const stateClass = submitted
+                              ? right
+                                ? "correct"
+                                : "incorrect"
+                              : picked
+                                ? "answered"
+                                : "";
+                            const stateLabel = submitted
+                              ? right
+                                ? "Đúng"
+                                : "Chưa chính xác"
+                              : picked
+                                ? "Đã chọn đáp án"
+                                : "Chưa chọn đáp án";
+                            return (
+                              <button
+                                type="button"
+                                key={q.id}
+                                className={`quiz-palette-item ${stateClass}`}
+                                aria-label={`Câu ${i + 1}: ${stateLabel}`}
+                                onClick={() => {
+                                  const el = document.getElementById(
+                                    `question-${q.id}`,
+                                  );
+                                  el?.focus();
+                                  el?.scrollIntoView({
+                                    behavior: "instant",
+                                    block: "center",
+                                  });
+                                }}
+                              >
+                                <span aria-hidden="true">
+                                  Câu {i + 1}
+                                  {submitted
+                                    ? right
+                                      ? " ✓"
+                                      : " ✕"
+                                    : picked
+                                      ? " •"
+                                      : ""}
+                                </span>
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
                     <form
                       onSubmit={(e) => {
                         e.preventDefault();
@@ -1097,7 +1205,12 @@ export default function LearningApp() {
                       }}
                     >
                       {lesson.questions.map((q, i) => (
-                        <fieldset key={q.id} disabled={submitted}>
+                        <fieldset
+                          key={q.id}
+                          id={`question-${q.id}`}
+                          tabIndex={-1}
+                          disabled={submitted}
+                        >
                           <legend>
                             {i + 1}. {q.prompt}
                           </legend>
@@ -1203,6 +1316,7 @@ export default function LearningApp() {
                   lessons={syllabus}
                   lesson={lesson}
                   progress={currentProgress}
+                  allProgress={progress}
                   percent={percent(lesson)}
                   onOpen={openLesson}
                   onJump={jump}
