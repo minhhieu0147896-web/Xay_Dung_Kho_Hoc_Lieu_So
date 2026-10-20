@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useEffectEvent, useRef, useState } from "react";
+import LandingPage from "./landing-page";
 import HomePage from "./home-page";
 import LessonVideo from "./lesson-video";
 import StudyOutline from "./study-outline";
@@ -33,15 +34,25 @@ import {
   readStored,
   writeStored,
   contentLabel,
+  lessonProgressSummary,
 } from "../services/learning";
 
-type View = "home" | "settings" | "progress" | "reader" | "teacher" | "admin";
+type View =
+  | "landing"
+  | "home"
+  | "settings"
+  | "progress"
+  | "reader"
+  | "teacher"
+  | "admin";
+
 const users = [
   { id: "student-1", name: "Minh Anh", role: "Học sinh" },
   { id: "student-2", name: "Hoàng Nam", role: "Học sinh" },
   { id: "teacher", name: "Cô Lan", role: "Giáo viên" },
   { id: "admin", name: "Quản trị", role: "Quản trị" },
 ];
+
 function Icon({ name, size = 20 }: { name: string; size?: number }) {
   const paths: Record<string, string> = {
     video: "M3 5h18v14H3zM10 9l5 3-5 3V9Z",
@@ -74,12 +85,14 @@ function Icon({ name, size = 20 }: { name: string; size?: number }) {
     </svg>
   );
 }
+
 export default function LearningApp() {
   const [signedIn, setSignedIn] = useState(false);
+  const [showLogin, setShowLogin] = useState(false);
   const [readerMode, setReaderMode] = useState<"read" | "ask" | "quiz">("read");
   const [course, setCourse] = useState<Course>(defaultCourse);
   const [ready, setReady] = useState(false);
-  const [view, setView] = useState<View>("home");
+  const [view, setView] = useState<View>("landing");
   const [workspace, setWorkspace] = useState<Workspace>({
     schemaVersion: 2,
     published: initialLessons,
@@ -123,16 +136,8 @@ export default function LearningApp() {
   const lessonIndex = syllabus.findIndex((l) => l.id === lesson.id);
   const published = lessons.filter((l) => l.status === "published");
   const percent = (l: Lesson) =>
-    Math.round(
-      ((l.sections.filter((s) =>
-        progress[l.id]?.completedSectionIds.includes(s.id),
-      ).length +
-        (l.questions.length && progress[l.id]?.quizScore !== undefined
-          ? 1
-          : 0)) /
-        Math.max(1, l.sections.length + (l.questions.length ? 1 : 0))) *
-        100,
-    );
+    lessonProgressSummary(l, progress[l.id]).percent;
+
   useEffect(() => {
     const timer = setTimeout(() => {
       try {
@@ -201,6 +206,7 @@ export default function LearningApp() {
       if ("speechSynthesis" in window) window.speechSynthesis.cancel();
     };
   }, []);
+
   useEffect(() => {
     if (!ready) return;
     try {
@@ -212,12 +218,17 @@ export default function LearningApp() {
       /* The catalogue still works in memory when storage is unavailable. */
     }
   }, [ready, catalogFilter, query, course]);
+
   function updateUrl(next: View, id = selected, mode = "read", sectionId = "") {
     const params = new URLSearchParams();
     if (next === "reader") {
       params.set("bai", id);
       if (mode !== "read") params.set("hoat-dong", mode);
-    } else if (next !== "home") params.set("trang", next);
+    } else if (next === "home") {
+      params.set("trang", "kho");
+    } else if (next !== "landing") {
+      params.set("trang", next);
+    }
     const url =
       "/" +
       (params.size ? `?${params}` : "") +
@@ -229,6 +240,7 @@ export default function LearningApp() {
       window.history.pushState(null, "", url);
     lastUrl.current = url;
   }
+
   const restoreLocation = useEffectEvent(() => {
     if (editor) {
       const error = commitEditor(editor, false, {
@@ -248,12 +260,14 @@ export default function LearningApp() {
     const page = params.get("trang");
     const next: View = target
       ? "reader"
-      : page === "settings" ||
-          page === "progress" ||
-          (page === "teacher" && user.role === "Giáo viên") ||
-          (page === "admin" && user.role === "Quản trị")
-        ? page
-        : "home";
+      : page === "kho" || page === "home"
+        ? "home"
+        : page === "settings" ||
+            page === "progress" ||
+            (page === "teacher" && user.role === "Giáo viên") ||
+            (page === "admin" && user.role === "Quản trị")
+          ? page
+          : "landing";
     setView(next);
     if (target) {
       if (target.id !== selected) {
@@ -294,6 +308,7 @@ export default function LearningApp() {
       else window.scrollTo({ top: 0 });
     });
   });
+
   useEffect(() => {
     if (!ready) return;
     const timer = setTimeout(() => restoreLocation(), 0);
@@ -304,12 +319,14 @@ export default function LearningApp() {
       window.removeEventListener("popstate", onBack);
     };
   }, [ready]);
+
   function persist(key: string, value: unknown) {
     if (!writeStored(key, value))
       setNotice(
         "Trình duyệt không cho phép lưu. Dữ liệu hiện chỉ được giữ trong phiên này.",
       );
   }
+
   function log(message: string) {
     const next = [
       `${new Date().toLocaleString("vi-VN")} · ${user.name}: ${message}`,
@@ -318,10 +335,12 @@ export default function LearningApp() {
     setLogs(next);
     persist("suhoc-logs-v1", next);
   }
+
   function stopSpeech() {
     if ("speechSynthesis" in window) window.speechSynthesis.cancel();
     setSpeech("stopped");
   }
+
   function commitEditor(
     input: Lesson,
     publish: boolean,
@@ -351,6 +370,7 @@ export default function LearningApp() {
         : "Không lưu được học liệu.";
     }
   }
+
   function navigate(next: View, lessonId = selected) {
     if (editor && next !== "teacher") {
       const error = commitEditor(editor, false, {
@@ -379,6 +399,7 @@ export default function LearningApp() {
       window.scrollTo({ top: 0 });
     });
   }
+
   function jump(id: string, lessonId = selected) {
     updateUrl(
       "reader",
@@ -394,6 +415,7 @@ export default function LearningApp() {
       el?.scrollIntoView({ behavior: "instant", block: "center" });
     });
   }
+
   function switchReader(mode: "read" | "ask" | "quiz") {
     stopSpeech();
     setReaderMode(mode);
@@ -402,18 +424,21 @@ export default function LearningApp() {
       document.getElementById(`panel-${mode}`)?.focus(),
     );
   }
+
   function openLesson(l: Lesson, sectionId?: string) {
     setCourse({ subject: l.subject, grade: l.grade, book: bookId(l) });
     setSelected(l.id);
     navigate("reader", l.id);
     if (sectionId) jump(sectionId, l.id);
   }
+
   function changeCourse(next: Course) {
     setCourse(next);
     setQuery("");
     setCatalogFilter("read");
     navigate("home");
   }
+
   function saveProgress(update: Partial<Progress>) {
     const next = {
       ...allProgress,
@@ -430,6 +455,7 @@ export default function LearningApp() {
     setAllProgress(next);
     persist("suhoc-progress-v1", next);
   }
+
   function toggleSection(id: string) {
     const ids = currentProgress?.completedSectionIds ?? [];
     saveProgress({
@@ -439,6 +465,7 @@ export default function LearningApp() {
       lastSectionId: id,
     });
   }
+
   function speak(text: string) {
     stopSpeech();
     const utterance = new SpeechSynthesisUtterance(text);
@@ -454,6 +481,7 @@ export default function LearningApp() {
     window.speechSynthesis.speak(utterance);
     setSpeech("playing");
   }
+
   function ask() {
     if (!question.trim()) return;
     setBusy(true);
@@ -466,6 +494,7 @@ export default function LearningApp() {
       });
     }, 350);
   }
+
   function submitQuiz() {
     const score = lesson.questions.filter(
       (q) => choices[q.id] === q.correctOptionId,
@@ -477,6 +506,7 @@ export default function LearningApp() {
     );
     requestAnimationFrame(() => resultRef.current?.focus());
   }
+
   function preference(kind: "large" | "contrast") {
     const prefs = {
       large: kind === "large" ? !large : large,
@@ -486,17 +516,20 @@ export default function LearningApp() {
     setContrast(prefs.contrast);
     persist(`suhoc-prefs-v1-${userId}`, prefs);
   }
+
   if (!ready)
     return (
       <p role="status" className="loading-page">
         Đang mở kho học liệu…
       </p>
     );
-  if (!signedIn) {
+
+  if (showLogin) {
     return (
       <DemoLogin
         onLogin={() => {
           setSignedIn(true);
+          setShowLogin(false);
           try {
             sessionStorage.setItem("suhoc-demo-session", "yes");
           } catch {
@@ -516,9 +549,14 @@ export default function LearningApp() {
             if (anchor) target?.scrollIntoView({ block: "center" });
           });
         }}
+        onCancel={() => {
+          setShowLogin(false);
+          requestAnimationFrame(() => headingRef.current?.focus());
+        }}
       />
     );
   }
+
   return (
     <div
       className={`app-shell textbook-app ${large ? "large-type" : ""} ${contrast ? "high-contrast" : ""}`}
@@ -532,7 +570,7 @@ export default function LearningApp() {
           href="#"
           onClick={(e) => {
             e.preventDefault();
-            navigate("home");
+            navigate("landing");
           }}
         >
           <span className="brand-icon">
@@ -546,6 +584,7 @@ export default function LearningApp() {
         <nav aria-label="Điều hướng chính">
           {(
             [
+              { id: "landing", label: "Trang chủ", icon: "home" },
               { id: "home", label: "Kho học liệu", icon: "book" },
               { id: "progress", label: "Học liệu đang học", icon: "chart" },
               {
@@ -591,6 +630,39 @@ export default function LearningApp() {
             </button>
           )}
         </nav>
+        <div className="sidebar-auth">
+          {signedIn ? (
+            <>
+              <span className="auth-badge" aria-label="Tài khoản đang dùng">
+                <span className="status-dot" aria-hidden="true" />
+                {user.name} · {user.role}
+              </span>
+              <button
+                type="button"
+                className="secondary auth-btn"
+                onClick={() => {
+                  setSignedIn(false);
+                  try {
+                    sessionStorage.removeItem("suhoc-demo-session");
+                  } catch {
+                    /* Ignore session storage errors. */
+                  }
+                  setNotice("Đã đăng xuất khỏi phiên thử nghiệm.");
+                }}
+              >
+                Đăng xuất
+              </button>
+            </>
+          ) : (
+            <button
+              type="button"
+              className="primary auth-btn"
+              onClick={() => setShowLogin(true)}
+            >
+              Đăng nhập
+            </button>
+          )}
+        </div>
         <div className="sidebar-bottom">
           <span className="status-dot" /> PHIÊN BẢN DEMO <span>v0.1</span>
         </div>
@@ -607,14 +679,14 @@ export default function LearningApp() {
           id="main"
           tabIndex={-1}
           className={
-            view === "home"
+            view === "home" || view === "landing"
               ? "home-main"
               : view === "reader"
                 ? "reader-main"
                 : undefined
           }
         >
-          {view !== "home" && view !== "reader" && (
+          {view !== "landing" && view !== "home" && view !== "reader" && (
             <div className="page-heading">
               <div>
                 <h1 ref={headingRef} tabIndex={-1}>
@@ -642,6 +714,23 @@ export default function LearningApp() {
               {notice}
             </p>
           )}
+          {view === "landing" && (
+            <LandingPage
+              lessons={lessons}
+              progress={progress}
+              signedIn={signedIn}
+              userName={user.name}
+              userRole={user.role}
+              headingRef={headingRef}
+              onExploreCatalog={() => navigate("home")}
+              onSelectSubject={(subject) =>
+                changeCourse({ ...course, subject })
+              }
+              onOpenLesson={openLesson}
+              onOpenLogin={() => setShowLogin(true)}
+              onOpenProgress={() => navigate("progress")}
+            />
+          )}
           {view === "home" && (
             <HomePage
               lessons={lessons}
@@ -658,36 +747,38 @@ export default function LearningApp() {
           )}
           {view === "settings" && (
             <section className="preferences-page" aria-label="Tùy chọn sử dụng">
-              <h2>Hiển thị và hỗ trợ đọc</h2>
-              <p>
-                Các tùy chọn được lưu riêng cho từng tài khoản trên thiết bị
-                này.
-              </p>{" "}
-              <div className="top-actions">
-                <button
-                  id="font-toggle"
-                  className="utility"
-                  aria-label="Chữ lớn"
-                  aria-pressed={large}
-                  onClick={() => preference("large")}
-                >
-                  Chữ lớn
-                </button>
-                <button
-                  className="utility"
-                  aria-label="Tương phản cao"
-                  aria-pressed={contrast}
-                  onClick={() => preference("contrast")}
-                >
-                  Tương phản
-                </button>
-                <div className="settings-account-heading">
-                  <h2>Tài khoản</h2>
-                  <p>
-                    Tài khoản mẫu dùng để thử các vai trò, chưa phải đăng nhập
-                    thật.
-                  </p>
+              <div className="settings-group">
+                <h2>Hiển thị và hỗ trợ đọc</h2>
+                <p>
+                  Các tùy chọn được lưu riêng cho từng tài khoản trên thiết bị
+                  này.
+                </p>
+                <div className="top-actions">
+                  <button
+                    id="font-toggle"
+                    className="utility"
+                    aria-label="Chữ lớn"
+                    aria-pressed={large}
+                    onClick={() => preference("large")}
+                  >
+                    Chữ lớn
+                  </button>
+                  <button
+                    className="utility"
+                    aria-label="Tương phản cao"
+                    aria-pressed={contrast}
+                    onClick={() => preference("contrast")}
+                  >
+                    Tương phản
+                  </button>
                 </div>
+              </div>
+              <div className="settings-group">
+                <h2>Tài khoản</h2>
+                <p>
+                  Tài khoản mẫu dùng để thử các vai trò, chưa phải đăng nhập
+                  thật.
+                </p>
                 <label className="user-picker">
                   <span>Tài khoản mẫu</span>
                   <select
@@ -744,12 +835,14 @@ export default function LearningApp() {
                             ? `${progress[l.id].quizScore}/${l.questions.length} câu đúng`
                             : "chưa làm"}
                         </p>
-                        <progress
-                          value={percent(l)}
-                          max={100}
-                          aria-label={`Tiến độ ${l.title}`}
-                        />
-                        <span> {percent(l)}%</span>
+                        <div className="progress-bar-row">
+                          <progress
+                            value={percent(l)}
+                            max={100}
+                            aria-label={`Tiến độ ${l.title}`}
+                          />
+                          <span>{percent(l)}%</span>
+                        </div>
                       </div>
                       <button
                         className="primary"

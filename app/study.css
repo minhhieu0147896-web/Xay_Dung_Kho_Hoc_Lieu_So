@@ -1,4 +1,5 @@
 /* Video-led learning workspace and light-blue navigation surfaces. Keep the lesson before navigation in source order. */
+:root,
 .textbook-app {
   --paper: #fff;
   --white: #fff;
@@ -16,7 +17,12 @@
   --done-bg: #e7f4ec;
   --done-border: #2c6b45;
   --done-ink: #1b4f30;
+  --danger-bg: #fdf2f2;
+  --danger-hover-bg: #fae1e1;
+  --danger-border: #d99b9b;
+  --danger-ink: #9e2a2b;
 }
+.high-contrast,
 .textbook-app.high-contrast {
   --ink: #0f1720;
   --muted: #263340;
@@ -32,6 +38,39 @@
   --done-bg: #dff0e5;
   --done-border: #1d5232;
   --done-ink: #123b22;
+  --danger-bg: #f9e6e6;
+  --danger-hover-bg: #f2d0d0;
+  --danger-border: #7a1c1d;
+  --danger-ink: #691415;
+}
+body {
+  font-family:
+    system-ui,
+    -apple-system,
+    "Segoe UI",
+    Roboto,
+    Helvetica,
+    Arial,
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Unified Demo Login screen */
+.login-page {
+  background: var(--nav-sub-bg);
+}
+.login-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  box-shadow: 0 4px 16px rgba(22, 36, 52, 0.05);
+}
+.login-demo {
+  background: var(--nav-bg);
+  border: 1px solid var(--border);
+  color: var(--ink);
+}
+.login-card input {
+  border: 1px solid var(--btn-border);
 }
 
 /* Top navigation bar and secondary navigation bars in soft light blue */
@@ -121,6 +160,122 @@
   border: 1px solid var(--done-border);
 }
 
+/* Action links styled as subtle, easy-to-spot light-blue pill buttons */
+.study-content .reader-shortcuts {
+  margin-bottom: 16px;
+  gap: 10px;
+}
+.study-content .reader-shortcuts a,
+.study-content .reader-shortcuts button,
+.study-video-heading button,
+.lesson-pagination .inline-link,
+.section-actions .inline-link,
+.authoring .inline-link,
+.progress-row .inline-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  min-height: 40px;
+  background: var(--btn-bg);
+  color: var(--green);
+  border: 1px solid var(--btn-border);
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 600;
+}
+.study-content .reader-shortcuts a:hover,
+.study-content .reader-shortcuts button:hover:not(:disabled),
+.study-video-heading button:hover:not(:disabled),
+.lesson-pagination .inline-link:hover:not(:disabled),
+.section-actions .inline-link:hover:not(:disabled),
+.authoring .inline-link:hover:not(:disabled),
+.progress-row .inline-link:hover:not(:disabled) {
+  background: var(--btn-hover-bg);
+  filter: none;
+}
+.authoring .danger-link,
+.table-editor-scroll .danger-link {
+  background: var(--danger-bg);
+  color: var(--danger-ink);
+  border: 1px solid var(--danger-border);
+}
+.authoring .danger-link:hover:not(:disabled),
+.table-editor-scroll .danger-link:hover:not(:disabled) {
+  background: var(--danger-hover-bg);
+  filter: none;
+}
+
+/* Settings & Progress page cards */
+.preferences-page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 760px;
+}
+.settings-group {
+  padding: 24px 28px;
+  background: var(--nav-sub-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+.settings-group h2 {
+  font-size: 1.2em;
+  margin-bottom: 8px;
+}
+.settings-group > p {
+  color: var(--muted);
+  margin-bottom: 18px;
+}
+.preferences-page .user-picker select {
+  background: var(--white);
+  border: 1px solid var(--btn-border);
+  border-radius: 6px;
+}
+.progress-row {
+  background: var(--nav-sub-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+.progress-bar-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 6px;
+}
+.progress-bar-row progress {
+  margin: 0;
+}
+.progress-bar-row > span {
+  font-weight: 700;
+  color: var(--green);
+  font-size: 0.9375em;
+}
+
+/* Reading section hierarchy */
+.textbook-app .reading-section {
+  padding: 20px 0 28px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 24px;
+}
+.reading-section > .eyebrow {
+  display: inline-flex;
+  padding: 3px 10px;
+  background: var(--nav-bg);
+  color: var(--green);
+  border: 1px solid var(--btn-border);
+  border-radius: 5px;
+  font-weight: 700;
+  font-size: 0.75em;
+  letter-spacing: 0.04em;
+  margin-bottom: 6px;
+}
+.reading-section .section-actions {
+  padding-top: 14px;
+  margin-top: 18px;
+  border-top: 1px dashed var(--border);
+}
+
 /* Catalog lesson rows as distinct clickable cards */
 .lesson-list {
   display: flex;
@@ -157,35 +312,6 @@
 }
 .study-content .lesson-heading {
   margin-bottom: 24px;
-}
-.study-content .reader-shortcuts {
-  margin-bottom: 16px;
-  gap: 10px;
-}
-.study-content .reader-shortcuts a,
-.study-content .reader-shortcuts button,
-.study-video-heading button,
-.lesson-pagination .inline-link,
-.section-actions .inline-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 8px 14px;
-  min-height: 40px;
-  background: var(--btn-bg);
-  color: var(--green);
-  border: 1px solid var(--btn-border);
-  border-radius: 6px;
-  text-decoration: none;
-  font-weight: 600;
-}
-.study-content .reader-shortcuts a:hover,
-.study-content .reader-shortcuts button:hover:not(:disabled),
-.study-video-heading button:hover:not(:disabled),
-.lesson-pagination .inline-link:hover:not(:disabled),
-.section-actions .inline-link:hover:not(:disabled) {
-  background: var(--btn-hover-bg);
-  filter: none;
 }
 .study-video-heading,
 .study-video-source,
@@ -607,6 +733,216 @@
 .citation:hover {
   background: var(--btn-hover-bg);
 }
+
+/* Top bar auth controls & login actions */
+.login-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 16px;
+}
+.login-actions .login-submit,
+.login-actions .login-cancel {
+  margin-top: 0;
+  flex: 1 1 180px;
+}
+.sidebar-auth {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: auto;
+}
+.auth-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  background: var(--white);
+  border: 1px solid var(--border);
+  font-size: 0.875em;
+  font-weight: 600;
+  color: var(--ink);
+}
+.auth-btn {
+  min-height: 38px;
+  padding: 8px 14px;
+  font-size: 0.875em;
+}
+
+/* Home / Landing Page */
+.landing-page {
+  display: grid;
+  gap: 36px;
+}
+.landing-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.45fr) minmax(280px, 1fr);
+  gap: 24px;
+  padding: 28px;
+  border-radius: 8px;
+  background: var(--nav-sub-bg);
+  border: 1px solid var(--btn-border);
+  align-items: start;
+}
+.landing-hero-body h1 {
+  margin: 6px 0 12px;
+  font-size: 2em;
+  line-height: 1.25;
+  letter-spacing: -0.015em;
+  color: var(--ink);
+}
+.landing-lead {
+  margin: 0 0 20px;
+  font-size: 1.0625em;
+  line-height: 1.65;
+  color: var(--muted);
+  max-width: 64ch;
+}
+.landing-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.landing-status-box {
+  padding: 20px;
+  border-radius: 8px;
+  background: var(--white);
+  border: 1px solid var(--border);
+}
+.landing-status-box h2 {
+  margin: 0 0 8px;
+  font-size: 1.0625em;
+  color: var(--green);
+}
+.landing-status-box > p {
+  margin: 0 0 14px;
+  font-size: 0.9375em;
+  line-height: 1.5;
+  color: var(--muted);
+}
+.landing-metrics {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+.landing-metrics div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 0.875em;
+}
+.landing-metrics dt {
+  color: var(--muted);
+}
+.landing-metrics dd {
+  margin: 0;
+  font-weight: 600;
+  color: var(--ink);
+  text-align: right;
+}
+.landing-section {
+  display: grid;
+  gap: 16px;
+}
+.landing-section-header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 12px;
+}
+.landing-section-header h2 {
+  margin: 4px 0 0;
+  font-size: 1.375em;
+}
+.landing-section-header > p {
+  margin: 0;
+  color: var(--muted);
+}
+.landing-subject-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px;
+}
+.landing-subject-card {
+  display: grid;
+  gap: 8px;
+  padding: 16px 18px;
+  border-radius: 8px;
+  background: var(--white);
+  border: 1px solid var(--border);
+  text-align: left;
+  color: var(--ink);
+}
+.landing-subject-card.has-content {
+  background: var(--btn-bg);
+  border-color: var(--btn-border);
+}
+.landing-subject-card:hover {
+  background: var(--btn-hover-bg);
+  border-color: var(--green);
+}
+.landing-subject-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+.landing-subject-top strong {
+  font-size: 1.0625em;
+  color: var(--ink);
+}
+.landing-subject-top span {
+  padding: 2px 8px;
+  border-radius: 4px;
+  background: var(--white);
+  border: 1px solid var(--border);
+  font-size: 0.75em;
+  font-weight: 600;
+  color: var(--green);
+}
+.landing-subject-card small {
+  color: var(--muted);
+  font-size: 0.875em;
+  line-height: 1.4;
+}
+.landing-steps-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+.landing-step-card {
+  padding: 20px;
+  border-radius: 8px;
+  background: var(--white);
+  border: 1px solid var(--border);
+}
+.landing-step-num {
+  display: inline-grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  margin-bottom: 12px;
+  border-radius: 6px;
+  background: var(--nav-bg);
+  border: 1px solid var(--btn-border);
+  color: var(--green);
+  font-weight: 700;
+}
+.landing-step-card h3 {
+  margin: 0 0 8px;
+  font-size: 1.0625em;
+}
+.landing-step-card p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.55;
+  font-size: 0.9375em;
+}
+
 @media (max-width: 1100px) {
   .study-layout {
     grid-template-columns: minmax(0, 1fr) 300px;
@@ -616,6 +952,13 @@
   }
 }
 @media (max-width: 900px) {
+  .landing-hero {
+    grid-template-columns: 1fr;
+    padding: 22px;
+  }
+  .landing-steps-grid {
+    grid-template-columns: 1fr;
+  }
   .study-layout {
     display: block;
   }
@@ -650,6 +993,17 @@
   .textbook-app.large-type .sidebar,
   .textbook-app.high-contrast .sidebar {
     padding: 14px 20px;
+  }
+  .sidebar-auth {
+    margin-left: 0;
+    width: 100%;
+    justify-content: flex-start;
+  }
+  .landing-hero-body h1 {
+    font-size: 1.5em;
+  }
+  .settings-group {
+    padding: 20px;
   }
 }
 @media (max-width: 400px) {

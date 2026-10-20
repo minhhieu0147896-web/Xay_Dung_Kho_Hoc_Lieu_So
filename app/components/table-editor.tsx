@@ -51,7 +51,7 @@ export default function TableEditor({
                   />
                   <button
                     type="button"
-                    className="inline-link"
+                    className="inline-link danger-link"
                     disabled={width <= 1}
                     aria-label={`Xóa cột ${col + 1}: ${header}`}
                     onClick={() =>
@@ -96,7 +96,7 @@ export default function TableEditor({
                 <td>
                   <button
                     type="button"
-                    className="inline-link"
+                    className="inline-link danger-link"
                     aria-label={`Xóa hàng ${ri + 1}`}
                     onClick={() =>
                       onChange({

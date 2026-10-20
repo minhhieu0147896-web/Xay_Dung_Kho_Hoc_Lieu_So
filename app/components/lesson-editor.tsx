@@ -402,7 +402,9 @@ export default function LessonEditor({
                       edition: "",
                       ...draft.provenance,
                       kind: e.target.value as
-                        "demo" | "textbook" | "adaptation",
+                        | "demo"
+                        | "textbook"
+                        | "adaptation",
                     },
                   })
                 }
@@ -515,7 +517,7 @@ export default function LessonEditor({
                 </button>
                 <button
                   type="button"
-                  className="inline-link"
+                  className="inline-link danger-link"
                   aria-label={`Bỏ mục khỏi bản nháp: ${section.heading}`}
                   disabled={draft.questions.some(
                     (q) => q.sourceSectionId === section.id,
@@ -723,7 +725,7 @@ export default function LessonEditor({
                     </button>
                     <button
                       type="button"
-                      className="inline-link"
+                      className="inline-link danger-link"
                       aria-label={`Bỏ nội dung khỏi bản nháp: nội dung ${blockIndex + 1}, ${section.heading}`}
                       onClick={() =>
                         change({
@@ -799,13 +801,14 @@ export default function LessonEditor({
             Mã video YouTube
             <input
               value={draft.youtubeVideoId ?? ""}
-              onChange={(e) =>
+              onChange={(e) => {
+                const videoId = e.target.value.trim();
                 change({
                   ...draft,
-                  youtubeVideoId: e.target.value.trim(),
-                  youtubeSource: undefined,
-                })
-              }
+                  youtubeVideoId: videoId,
+                  youtubeSource: videoId ? draft.youtubeSource : undefined,
+                });
+              }}
             />
           </label>
           <label>
@@ -849,16 +852,24 @@ export default function LessonEditor({
                 Các lựa chọn (mỗi dòng một lựa chọn)
                 <textarea
                   value={q.options.join("\n")}
-                  onChange={(e) =>
+                  onChange={(e) => {
+                    const options = e.target.value.split("\n");
                     change({
                       ...draft,
                       questions: draft.questions.map((x) =>
                         x.id === q.id
-                          ? { ...x, options: e.target.value.split("\n") }
+                          ? {
+                              ...x,
+                              options,
+                              correctOptionId: Math.min(
+                                x.correctOptionId,
+                                Math.max(0, options.length - 1),
+                              ),
+                            }
                           : x,
                       ),
-                    })
-                  }
+                    });
+                  }}
                 />
               </label>
               <label>
@@ -923,7 +934,7 @@ export default function LessonEditor({
               </label>
               <button
                 type="button"
-                className="inline-link"
+                className="inline-link danger-link"
                 aria-label={`Bỏ câu hỏi khỏi bản nháp: câu ${i + 1}`}
                 onClick={() =>
                   change({
