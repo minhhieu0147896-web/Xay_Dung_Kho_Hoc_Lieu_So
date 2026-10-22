@@ -1,6 +1,7 @@
 "use client";
 import { sectionText } from "../services/content";
 import type { RefObject } from "react";
+import { ArrowRight, BookOpen, ListFilter, Video } from "lucide-react";
 import type { Lesson, Progress } from "../data/lessons";
 import {
   normalize,
@@ -69,15 +70,18 @@ export default function HomePage({
           aria-pressed={filter === "read"}
           onClick={() => onFilter("read")}
         >
+          <BookOpen size={16} aria-hidden="true" />
           Có bài đọc ({available.filter(hasReading).length})
         </button>
         <button
           aria-pressed={filter === "video"}
           onClick={() => onFilter("video")}
         >
+          <Video size={16} aria-hidden="true" />
           Có video ({available.filter(hasVideo).length})
         </button>
         <button aria-pressed={all} onClick={() => onFilter("all")}>
+          <ListFilter size={16} aria-hidden="true" />
           Toàn bộ mục lục ({available.length})
         </button>
       </div>
@@ -143,7 +147,7 @@ export default function HomePage({
                             {summary.label && ` · ${summary.label}`}
                           </small>
                         </span>
-                        <span aria-hidden="true">→</span>
+                        <ArrowRight size={18} aria-hidden="true" />
                       </button>
                     </li>
                   );

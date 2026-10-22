@@ -943,6 +943,60 @@ body {
   font-size: 0.9375em;
 }
 
+/* Lucide icon alignment & interactive polish */
+.notice-toast {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: 8px;
+  background: var(--nav-bg);
+  border: 1px solid var(--btn-border);
+  box-shadow: 0 2px 8px rgba(22, 36, 52, 0.06);
+}
+.notice-dismiss {
+  min-height: 32px;
+  padding: 4px 10px;
+  font-size: 0.875em;
+}
+.landing-hero-body .eyebrow,
+.landing-subject-top strong,
+.catalog-filters button,
+.study-video-heading h2,
+.study-video-source a,
+.study-transcript summary,
+.study-content .reader-navigation button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.study-player > p[role="status"] {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .primary,
+  .secondary,
+  .utility,
+  .inline-link,
+  .nav-item,
+  .lesson-row,
+  .landing-subject-card,
+  .quiz-option,
+  .quiz-palette-item,
+  .study-lesson {
+    transition:
+      background-color 0.15s ease,
+      border-color 0.15s ease,
+      color 0.15s ease,
+      box-shadow 0.15s ease;
+  }
+}
+
 @media (max-width: 1100px) {
   .study-layout {
     grid-template-columns: minmax(0, 1fr) 300px;

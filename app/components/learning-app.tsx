@@ -1,6 +1,25 @@
 "use client";
 
 import { useEffect, useEffectEvent, useRef, useState } from "react";
+import {
+  ArrowLeft,
+  ArrowRight,
+  BarChart3,
+  BookOpen,
+  Check,
+  CheckCircle2,
+  Flag,
+  GraduationCap,
+  HelpCircle,
+  Home,
+  LogIn,
+  LogOut,
+  Settings,
+  ShieldCheck,
+  Sparkles,
+  Volume2,
+  X,
+} from "lucide-react";
 import LandingPage from "./landing-page";
 import HomePage from "./home-page";
 import LessonVideo from "./lesson-video";
@@ -52,39 +71,6 @@ const users = [
   { id: "teacher", name: "Cô Lan", role: "Giáo viên" },
   { id: "admin", name: "Quản trị", role: "Quản trị" },
 ];
-
-function Icon({ name, size = 20 }: { name: string; size?: number }) {
-  const paths: Record<string, string> = {
-    video: "M3 5h18v14H3zM10 9l5 3-5 3V9Z",
-    book: "M3 4h6c2 0 3 1 3 2v15c0-2-2-3-4-3H3V4Zm18 0h-6c-2 0-3 1-3 2v15c0-2 2-3 4-3h5V4Z",
-    home: "m3 10 9-7 9 7v11h-6v-7H9v7H3V10Z",
-    search: "M21 21l-5-5M18 10a8 8 0 1 1-16 0 8 8 0 0 1 16 0Z",
-    chart: "M4 20V10m8 10V4m8 16v-7",
-    arrow: "M4 12h16m-6-6 6 6-6 6",
-    audio: "M4 9h4l5-4v14l-5-4H4V9Zm13-1c3 2 3 6 0 8m3-11c5 4 5 10 0 14",
-    check: "m5 12 4 4L20 5",
-    sun: "M12 2v2m0 16v2M2 12h2m16 0h2M5 5l2 2m10 10 2 2M5 19l2-2M17 7l2-2M16 12a4 4 0 1 1-8 0 4 4 0 0 1 8 0Z",
-    clock: "M12 6v6l4 2M22 12a10 10 0 1 1-20 0 10 10 0 0 1 20 0Z",
-    spark: "m12 3 3 6 6 3-6 3-3 6-3-6-6-3 6-3 3-6Z",
-    settings: "M4 7h16M4 17h16M8 4v6m8 4v6",
-    flag: "M5 22V3h14l-3 5 3 5H5",
-  };
-  return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.6"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      <path d={paths[name] ?? paths.book} />
-    </svg>
-  );
-}
 
 export default function LearningApp() {
   const [signedIn, setSignedIn] = useState(false);
@@ -574,7 +560,7 @@ export default function LearningApp() {
           }}
         >
           <span className="brand-icon">
-            <Icon name="book" size={25} />
+            <BookOpen size={22} aria-hidden="true" />
           </span>
           <span>
             Học liệu số<span className="brand-sub">Thư viện học tập</span>
@@ -584,13 +570,17 @@ export default function LearningApp() {
         <nav aria-label="Điều hướng chính">
           {(
             [
-              { id: "landing", label: "Trang chủ", icon: "home" },
-              { id: "home", label: "Kho học liệu", icon: "book" },
-              { id: "progress", label: "Học liệu đang học", icon: "chart" },
+              { id: "landing", label: "Trang chủ", IconComp: Home },
+              { id: "home", label: "Kho học liệu", IconComp: BookOpen },
+              {
+                id: "progress",
+                label: "Học liệu đang học",
+                IconComp: BarChart3,
+              },
               {
                 id: "settings",
                 label: "Cài đặt & tài khoản",
-                icon: "settings",
+                IconComp: Settings,
               },
             ] as const
           ).map((n) => (
@@ -607,7 +597,7 @@ export default function LearningApp() {
                 navigate(n.id);
               }}
             >
-              <Icon name={n.icon} />
+              <n.IconComp size={18} aria-hidden="true" />
               {n.label}
             </button>
           ))}
@@ -616,7 +606,7 @@ export default function LearningApp() {
               className={`nav-item ${view === "teacher" ? "active" : ""}`}
               onClick={() => navigate("teacher")}
             >
-              <Icon name="settings" />
+              <GraduationCap size={18} aria-hidden="true" />
               Quản lý học liệu
             </button>
           )}
@@ -625,7 +615,7 @@ export default function LearningApp() {
               className={`nav-item ${view === "admin" ? "active" : ""}`}
               onClick={() => navigate("admin")}
             >
-              <Icon name="settings" />
+              <ShieldCheck size={18} aria-hidden="true" />
               Quản trị demo
             </button>
           )}
@@ -650,6 +640,7 @@ export default function LearningApp() {
                   setNotice("Đã đăng xuất khỏi phiên thử nghiệm.");
                 }}
               >
+                <LogOut size={16} aria-hidden="true" />
                 Đăng xuất
               </button>
             </>
@@ -659,6 +650,7 @@ export default function LearningApp() {
               className="primary auth-btn"
               onClick={() => setShowLogin(true)}
             >
+              <LogIn size={16} aria-hidden="true" />
               Đăng nhập
             </button>
           )}
@@ -710,9 +702,18 @@ export default function LearningApp() {
           )}
           {!ready && <p role="status">Đang tải không gian học tập…</p>}
           {notice && (
-            <p className="notice" role="status">
-              {notice}
-            </p>
+            <div className="notice notice-toast" role="status">
+              <span>{notice}</span>
+              <button
+                type="button"
+                className="inline-link notice-dismiss"
+                aria-label="Đóng thông báo"
+                onClick={() => setNotice("")}
+              >
+                <X size={16} aria-hidden="true" />
+                Đóng
+              </button>
+            </div>
           )}
           {view === "landing" && (
             <LandingPage
@@ -851,13 +852,13 @@ export default function LearningApp() {
                           openLesson(l, progress[l.id]?.lastSectionId)
                         }
                       >
-                        Tiếp tục học <Icon name="arrow" size={16} />
+                        Tiếp tục học <ArrowRight size={16} aria-hidden="true" />
                       </button>
                     </article>
                   ))
               ) : (
                 <div className="empty-state">
-                  <Icon name="book" size={36} />
+                  <BookOpen size={36} aria-hidden="true" />
                   <h2>Hành trình của bạn bắt đầu từ đây</h2>
                   <p>
                     Đánh dấu mục đã đọc hoặc hoàn thành quiz để lưu tiến độ đầu
@@ -880,7 +881,7 @@ export default function LearningApp() {
                         className="inline-link"
                         onClick={() => navigate("home")}
                       >
-                        ← Đổi bài / môn
+                        <ArrowLeft size={16} aria-hidden="true" /> Đổi bài / môn
                       </button>
                       <a href="#book-navigation">Danh sách bài</a>
                       <button
@@ -910,9 +911,13 @@ export default function LearningApp() {
                   >
                     {(
                       [
-                        { id: "read", label: "Đọc bài" },
-                        { id: "ask", label: "Hỏi đáp" },
-                        { id: "quiz", label: "Luyện tập" },
+                        { id: "read", label: "Đọc bài", IconComp: BookOpen },
+                        { id: "ask", label: "Hỏi đáp", IconComp: HelpCircle },
+                        {
+                          id: "quiz",
+                          label: "Luyện tập",
+                          IconComp: CheckCircle2,
+                        },
                       ] as const
                     ).map((item) => (
                       <button
@@ -921,6 +926,7 @@ export default function LearningApp() {
                         aria-controls={`panel-${item.id}`}
                         onClick={() => switchReader(item.id)}
                       >
+                        <item.IconComp size={17} aria-hidden="true" />
                         {item.label}
                       </button>
                     ))}
@@ -937,7 +943,7 @@ export default function LearningApp() {
                     >
                       <summary>Nghe bài · Giọng đọc của thiết bị</summary>
                       <div className="audio-bar">
-                        <Icon name="audio" />
+                        <Volume2 size={20} aria-hidden="true" />
                         <div>
                           <strong>Lắng nghe bài học</strong>
                           <small>
@@ -1065,7 +1071,7 @@ export default function LearningApp() {
                             aria-label={`${currentProgress?.completedSectionIds.includes(s.id) ? "Đã đọc mục này" : "Đánh dấu đã đọc"}: ${s.heading}`}
                             onClick={() => toggleSection(s.id)}
                           >
-                            <Icon name="check" size={16} />
+                            <Check size={16} aria-hidden="true" />
                             {currentProgress?.completedSectionIds.includes(s.id)
                               ? "Đã đọc mục này"
                               : "Đánh dấu đã đọc"}
@@ -1078,7 +1084,7 @@ export default function LearningApp() {
                               }
                               aria-label={`Nghe mục này: ${s.heading}`}
                             >
-                              <Icon name="audio" size={16} />
+                              <Volume2 size={16} aria-hidden="true" />
                               Nghe mục này
                             </button>
                           )}
@@ -1118,7 +1124,7 @@ export default function LearningApp() {
                               onClick={() => switchReader("quiz")}
                             >
                               Luyện tập ({lesson.questions.length} câu){" "}
-                              <Icon name="arrow" size={16} />
+                              <ArrowRight size={16} aria-hidden="true" />
                             </button>
                           )}
                           <button
@@ -1139,7 +1145,8 @@ export default function LearningApp() {
                     hidden={readerMode !== "ask"}
                   >
                     <span className="eyebrow green">
-                      <Icon name="spark" size={15} /> HIỂU THÊM QUA CÂU HỎI
+                      <Sparkles size={15} aria-hidden="true" /> HIỂU THÊM QUA
+                      CÂU HỎI
                     </span>
                     <h2 id="ask" tabIndex={-1}>
                       Bạn muốn tìm hiểu điều gì?
@@ -1174,7 +1181,7 @@ export default function LearningApp() {
                         }
                       >
                         {busy ? "Đang tìm đoạn nguồn…" : "Tìm câu trả lời"}
-                        <Icon name="arrow" size={16} />
+                        <ArrowRight size={16} aria-hidden="true" />
                       </button>
                     </form>
                     <p role="status" className="sr-only">
@@ -1202,7 +1209,8 @@ export default function LearningApp() {
                               )
                             }
                           >
-                            <Icon name="book" size={16} /> {lesson.title} ·{" "}
+                            <BookOpen size={16} aria-hidden="true" />{" "}
+                            {lesson.title} ·{" "}
                             {
                               lesson.sections.find((s) => s.id === c.sectionId)
                                 ?.heading
@@ -1364,7 +1372,7 @@ export default function LearningApp() {
                         ref={resultRef}
                         tabIndex={-1}
                       >
-                        <Icon name="flag" />
+                        <Flag size={24} aria-hidden="true" />
                         <h3>
                           Bạn trả lời đúng {currentProgress?.quizScore}/
                           {lesson.questions.length} câu

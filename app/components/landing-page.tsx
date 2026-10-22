@@ -1,5 +1,13 @@
 "use client";
 import type { RefObject } from "react";
+import {
+  ArrowRight,
+  BookOpen,
+  Compass,
+  LogIn,
+  PlayCircle,
+  Sparkles,
+} from "lucide-react";
 import type { Lesson, Progress } from "../data/lessons";
 import {
   hasReading,
@@ -61,7 +69,8 @@ export default function LandingPage({
       <section className="landing-hero" aria-labelledby="landing-title">
         <div className="landing-hero-body">
           <p className="eyebrow">
-            THƯ VIỆN HỌC TẬP SỐ THPT · KẾT NỐI TRI THỨC VỚI CUỘC SỐNG
+            <Sparkles size={14} aria-hidden="true" /> THƯ VIỆN HỌC TẬP SỐ THPT ·
+            KẾT NỐI TRI THỨC VỚI CUỘC SỐNG
           </p>
           <h1 id="landing-title" ref={headingRef} tabIndex={-1}>
             Học tập theo sách giáo khoa, tra cứu nguồn và luyện tập
@@ -74,7 +83,9 @@ export default function LandingPage({
           </p>
           <div className="landing-hero-actions">
             <button className="primary" onClick={onExploreCatalog}>
-              Khám phá Kho học liệu →
+              <Compass size={18} aria-hidden="true" />
+              Khám phá Kho học liệu
+              <ArrowRight size={16} aria-hidden="true" />
             </button>
             {recentLesson ? (
               <button
@@ -86,14 +97,17 @@ export default function LandingPage({
                   )
                 }
               >
+                <PlayCircle size={18} aria-hidden="true" />
                 Tiếp tục: {lessonLabel(recentLesson)}
               </button>
             ) : !signedIn ? (
               <button className="secondary" onClick={onOpenLogin}>
+                <LogIn size={18} aria-hidden="true" />
                 Đăng nhập tài khoản demo
               </button>
             ) : (
               <button className="secondary" onClick={onOpenProgress}>
+                <BookOpen size={18} aria-hidden="true" />
                 Xem học liệu đang học
               </button>
             )}
@@ -154,7 +168,9 @@ export default function LandingPage({
                 onClick={() => onSelectSubject(subject)}
               >
                 <div className="landing-subject-top">
-                  <strong>{subject}</strong>
+                  <strong>
+                    <BookOpen size={16} aria-hidden="true" /> {subject}
+                  </strong>
                   <span>Lớp 12</span>
                 </div>
                 <small>
@@ -176,6 +192,7 @@ export default function LandingPage({
           </div>
           <button className="secondary" onClick={onExploreCatalog}>
             Xem toàn bộ 17 bài trong mục lục
+            <ArrowRight size={16} aria-hidden="true" />
           </button>
         </div>
         <ol className="lesson-list">
@@ -209,7 +226,7 @@ export default function LandingPage({
                       {summary.label && ` · ${summary.label}`}
                     </small>
                   </span>
-                  <span aria-hidden="true">→</span>
+                  <ArrowRight size={18} aria-hidden="true" />
                 </button>
               </li>
             );

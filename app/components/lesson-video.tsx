@@ -1,5 +1,13 @@
 "use client";
 import { useState } from "react";
+import {
+  ChevronDown,
+  ChevronUp,
+  ExternalLink,
+  FileText,
+  Video,
+  VolumeX,
+} from "lucide-react";
 import type { Lesson } from "../data/content";
 import { hasVideo } from "../services/learning";
 
@@ -14,7 +22,9 @@ export default function LessonVideo({
   if (!hasVideo(lesson))
     return (
       <section className="study-video-empty" aria-label="Video bài học">
-        <span aria-hidden="true">▷</span>
+        <span aria-hidden="true">
+          <Video size={22} />
+        </span>
         <div>
           <strong>Chưa có video cho bài này</strong>
           <p>Bạn vẫn có thể dùng các học liệu hiện có bên dưới.</p>
@@ -25,7 +35,8 @@ export default function LessonVideo({
     <section className="study-video" aria-labelledby="video-title">
       <div className="study-video-heading">
         <h2 id="video-title" tabIndex={-1}>
-          Video bài giảng <span>Tham khảo</span>
+          <Video size={18} aria-hidden="true" /> Video bài giảng{" "}
+          <span>Tham khảo</span>
         </h2>
         <button
           className="inline-link"
@@ -33,15 +44,23 @@ export default function LessonVideo({
           aria-controls="video-player"
           onClick={() => setExpanded(!expanded)}
         >
-          {expanded ? "Thu gọn video" : "Mở video"}
+          {expanded ? (
+            <>
+              <ChevronUp size={16} aria-hidden="true" /> Thu gọn video
+            </>
+          ) : (
+            <>
+              <ChevronDown size={16} aria-hidden="true" /> Mở video
+            </>
+          )}
         </button>
       </div>
       <div id="video-player" className="study-player" hidden={!expanded}>
         {expanded &&
           (audioActive ? (
             <p role="status">
-              Đang nghe bài đọc. Video được dừng để tránh phát hai nguồn âm
-              thanh cùng lúc.
+              <VolumeX size={20} aria-hidden="true" /> Đang nghe bài đọc. Video
+              được dừng để tránh phát hai nguồn âm thanh cùng lúc.
             </p>
           ) : (
             <iframe
@@ -60,12 +79,13 @@ export default function LessonVideo({
           target="_blank"
           rel="noreferrer"
         >
-          Mở trên YouTube ↗
+          Mở trên YouTube <ExternalLink size={14} aria-hidden="true" />
         </a>
       </div>
       <details className="study-transcript">
         <summary>
-          Bản chép lời & mô tả video{!lesson.transcript ? " · Chưa có" : ""}
+          <FileText size={16} aria-hidden="true" /> Bản chép lời & mô tả video
+          {!lesson.transcript ? " · Chưa có" : ""}
         </summary>
         <p className="paragraph-text">
           {lesson.transcript ||
