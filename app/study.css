@@ -997,6 +997,370 @@ body {
   }
 }
 
+/* Multi-color semantic accents for subjects, content types, progress & actions */
+.eyebrow-amber {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #fef3c7;
+  border: 1px solid #f59e0b;
+  color: #92400e;
+}
+.eyebrow-violet {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: #ede9fe;
+  border: 1px solid #c4b5fd;
+  color: #5b21b6;
+}
+.eyebrow-emerald {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: #dcfce7;
+  border: 1px solid #86efac;
+  color: #166534;
+}
+.eyebrow-teal {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: #ccfbf1;
+  border: 1px solid #5eead4;
+  color: #115e59;
+}
+
+.btn-amber.secondary {
+  background: #fffbeb;
+  border-color: #f59e0b;
+  color: #92400e;
+}
+.btn-amber.secondary:hover {
+  background: #fef3c7;
+  border-color: #d97706;
+}
+
+.metric-badge {
+  padding: 2px 8px;
+  border-radius: 6px;
+}
+.metric-amber {
+  background: #fef3c7;
+  color: #92400e;
+}
+.metric-blue {
+  background: #dbeafe;
+  color: #1e40af;
+}
+.metric-emerald {
+  background: #dcfce7;
+  color: #166534;
+}
+
+/* 8 Subject Card Tones */
+.subject-icon {
+  display: inline-grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+}
+.icon-amber {
+  background: #fef3c7;
+  border-color: #fcd34d;
+  color: #b45309;
+}
+.icon-teal {
+  background: #ccfbf1;
+  border-color: #5eead4;
+  color: #0f766e;
+}
+.icon-rose {
+  background: #ffe4e6;
+  border-color: #fda4af;
+  color: #be123c;
+}
+.icon-blue {
+  background: #dbeafe;
+  border-color: #93c5fd;
+  color: #1d4ed8;
+}
+.icon-violet {
+  background: #ede9fe;
+  border-color: #c4b5fd;
+  color: #6d28d9;
+}
+.icon-indigo {
+  background: #e0e7ff;
+  border-color: #a5b4fc;
+  color: #4338ca;
+}
+.icon-purple {
+  background: #f3e8ff;
+  border-color: #d8b4fe;
+  color: #7e22ce;
+}
+.icon-emerald {
+  background: #dcfce7;
+  border-color: #86efac;
+  color: #15803d;
+}
+
+.landing-subject-card.subject-amber.has-content {
+  background: #fffbeb;
+  border-color: #f59e0b;
+}
+.landing-subject-card.subject-amber:hover {
+  background: #fef3c7;
+  border-color: #d97706;
+}
+.landing-subject-card.subject-teal:hover {
+  background: #f0fdfa;
+  border-color: #0d9488;
+}
+.landing-subject-card.subject-rose:hover {
+  background: #fff1f2;
+  border-color: #e11d48;
+}
+.landing-subject-card.subject-blue:hover {
+  background: #eff6ff;
+  border-color: #2563eb;
+}
+.landing-subject-card.subject-violet:hover {
+  background: #f5f3ff;
+  border-color: #7c3aed;
+}
+.landing-subject-card.subject-indigo:hover {
+  background: #eef2ff;
+  border-color: #4f46e5;
+}
+.landing-subject-card.subject-purple:hover {
+  background: #faf5ff;
+  border-color: #9333ea;
+}
+.landing-subject-card.subject-emerald:hover {
+  background: #f0fdf4;
+  border-color: #16a34a;
+}
+
+.landing-subject-top .badge-amber {
+  background: #fef3c7;
+  border-color: #fcd34d;
+  color: #92400e;
+}
+.landing-subject-top .badge-teal {
+  background: #ccfbf1;
+  border-color: #99f6e4;
+  color: #115e59;
+}
+.landing-subject-top .badge-rose {
+  background: #ffe4e6;
+  border-color: #fecdd3;
+  color: #9f1239;
+}
+.landing-subject-top .badge-blue {
+  background: #dbeafe;
+  border-color: #bfdbfe;
+  color: #1e40af;
+}
+.landing-subject-top .badge-violet {
+  background: #ede9fe;
+  border-color: #ddd6fe;
+  color: #5b21b6;
+}
+.landing-subject-top .badge-indigo {
+  background: #e0e7ff;
+  border-color: #c7d2fe;
+  color: #3730a3;
+}
+.landing-subject-top .badge-purple {
+  background: #f3e8ff;
+  border-color: #e9d5ff;
+  color: #6b21a8;
+}
+.landing-subject-top .badge-emerald {
+  background: #dcfce7;
+  border-color: #bbf7d0;
+  color: #166534;
+}
+
+/* Lesson Meta Colored Pills */
+.lesson-meta-tags {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+}
+.meta-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 0.85em;
+  font-weight: 600;
+  border: 1px solid transparent;
+}
+.pill-blue {
+  background: #dbeafe;
+  border-color: #93c5fd;
+  color: #1e40af;
+}
+.pill-rose {
+  background: #ffe4e6;
+  border-color: #fda4af;
+  color: #9f1239;
+}
+.pill-violet {
+  background: #ede9fe;
+  border-color: #c4b5fd;
+  color: #5b21b6;
+}
+.pill-emerald {
+  background: #dcfce7;
+  border-color: #86efac;
+  color: #166534;
+}
+.pill-amber {
+  background: #fef3c7;
+  border-color: #fcd34d;
+  color: #92400e;
+}
+.pill-neutral {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+  color: #475569;
+}
+
+/* In-progress vs Completed Number Badges */
+.catalog-lesson-number.in-progress,
+.study-lesson-number.in-progress {
+  background: #fef3c7;
+  border-color: #f59e0b;
+  color: #92400e;
+  font-weight: 700;
+}
+.catalog-lesson-number.done,
+.study-lesson-number.done,
+.section-step.done {
+  background: #dcfce7;
+  border-color: #16a34a;
+  color: #166534;
+  font-weight: 700;
+}
+
+/* Catalog Filter Buttons by Type */
+.catalog-filters .filter-video[aria-pressed="true"] {
+  background: #be123c;
+  border-color: #be123c;
+  color: #fff;
+}
+.catalog-filters .filter-video[aria-pressed="false"]:hover {
+  background: #ffe4e6;
+  border-color: #fda4af;
+  color: #9f1239;
+}
+.catalog-filters .filter-all[aria-pressed="true"] {
+  background: #0f766e;
+  border-color: #0f766e;
+  color: #fff;
+}
+.catalog-filters .filter-all[aria-pressed="false"]:hover {
+  background: #ccfbf1;
+  border-color: #5eead4;
+  color: #115e59;
+}
+
+/* 3 Step Cards on Landing Page */
+.landing-step-card.step-blue {
+  border-top: 3px solid #2563eb;
+}
+.landing-step-card.step-violet {
+  border-top: 3px solid #7c3aed;
+}
+.landing-step-card.step-emerald {
+  border-top: 3px solid #16a34a;
+}
+.landing-step-num.num-blue {
+  background: #dbeafe;
+  border-color: #93c5fd;
+  color: #1d4ed8;
+}
+.landing-step-num.num-violet {
+  background: #ede9fe;
+  border-color: #c4b5fd;
+  color: #6d28d9;
+}
+.landing-step-num.num-emerald {
+  background: #dcfce7;
+  border-color: #86efac;
+  color: #15803d;
+}
+
+/* Reader Workspace Semantic Accents (Video = Rose, TTS = Teal, Ask = Violet, Next Step = Amber, Progress = Emerald) */
+.study-video-heading h2 span {
+  background: #ffe4e6;
+  border: 1px solid #fda4af;
+  color: #9f1239;
+}
+.listen-controls {
+  background: #f0fdfa;
+  border-color: #5eead4;
+}
+.listen-controls summary {
+  color: #0f766e;
+}
+.ask-panel .eyebrow.green {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #ede9fe;
+  border: 1px solid #c4b5fd;
+  color: #5b21b6;
+}
+.answer {
+  background: #f5f3ff;
+  border-color: #c4b5fd;
+}
+.citation {
+  background: #fff;
+  border-color: #a78bfa;
+  color: #5b21b6;
+}
+.citation:hover {
+  background: #ede9fe;
+}
+.quiz-panel .eyebrow.green {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #dcfce7;
+  border: 1px solid #86efac;
+  color: #166534;
+}
+.study-next-step {
+  background: #fffbeb;
+  border-color: #fcd34d;
+}
+.study-next-step .eyebrow {
+  color: #b45309;
+}
+.study-current progress::-webkit-progress-value,
+.progress-bar-row progress::-webkit-progress-value {
+  background: #16a34a;
+}
+.study-current progress::-moz-progress-bar,
+.progress-bar-row progress::-moz-progress-bar {
+  background: #16a34a;
+}
+
 @media (max-width: 1100px) {
   .study-layout {
     grid-template-columns: minmax(0, 1fr) 300px;

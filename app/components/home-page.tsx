@@ -50,7 +50,7 @@ export default function HomePage({
   return (
     <div className="repository-page">
       <header className="repository-heading">
-        <p className="eyebrow">KHO HỌC LIỆU</p>
+        <p className="eyebrow eyebrow-amber">KHO HỌC LIỆU</p>
         <h1 ref={headingRef} tabIndex={-1}>
           {course.subject} {course.grade}
         </h1>
@@ -67,6 +67,7 @@ export default function HomePage({
       </label>
       <div className="catalog-filters" aria-label="Phạm vi học liệu">
         <button
+          className="filter-btn filter-read"
           aria-pressed={filter === "read"}
           onClick={() => onFilter("read")}
         >
@@ -74,13 +75,18 @@ export default function HomePage({
           Có bài đọc ({available.filter(hasReading).length})
         </button>
         <button
+          className="filter-btn filter-video"
           aria-pressed={filter === "video"}
           onClick={() => onFilter("video")}
         >
           <Video size={16} aria-hidden="true" />
           Có video ({available.filter(hasVideo).length})
         </button>
-        <button aria-pressed={all} onClick={() => onFilter("all")}>
+        <button
+          className="filter-btn filter-all"
+          aria-pressed={all}
+          onClick={() => onFilter("all")}
+        >
           <ListFilter size={16} aria-hidden="true" />
           Toàn bộ mục lục ({available.length})
         </button>
@@ -135,16 +141,32 @@ export default function HomePage({
                         </span>
                         <span className="catalog-lesson-info">
                           <strong>{lessonLabel(l)}</strong>
-                          <small>
-                            {matched
-                              ? `Tìm thấy trong: ${matched.heading}`
-                              : contentLabel(l)}
-                            {hasVideo(l) &&
-                              hasReading(l) &&
-                              " · Video tham khảo"}
-                            {l.questions.length > 0 &&
-                              ` · ${l.questions.length} câu luyện tập`}
-                            {summary.label && ` · ${summary.label}`}
+                          <small className="lesson-meta-tags">
+                            <span
+                              className={`meta-pill ${matched ? "pill-amber" : hasReading(l) ? "pill-blue" : hasVideo(l) ? "pill-rose" : "pill-neutral"}`}
+                            >
+                              {matched
+                                ? `Tìm thấy trong: ${matched.heading}`
+                                : contentLabel(l)}
+                            </span>
+                            {hasVideo(l) && hasReading(l) && (
+                              <span className="meta-pill pill-rose">
+                                <Video size={12} aria-hidden="true" /> Video
+                                tham khảo
+                              </span>
+                            )}
+                            {l.questions.length > 0 && (
+                              <span className="meta-pill pill-violet">
+                                {l.questions.length} câu luyện tập
+                              </span>
+                            )}
+                            {summary.label && (
+                              <span
+                                className={`meta-pill ${summary.state === "completed" ? "pill-emerald" : "pill-amber"}`}
+                              >
+                                {summary.label}
+                              </span>
+                            )}
                           </small>
                         </span>
                         <ArrowRight size={18} aria-hidden="true" />

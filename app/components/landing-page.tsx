@@ -2,11 +2,20 @@
 import type { RefObject } from "react";
 import {
   ArrowRight,
+  Atom,
+  BookMarked,
   BookOpen,
+  Calculator,
   Compass,
+  Dna,
+  FlaskConical,
+  Globe,
+  Landmark,
+  Languages,
   LogIn,
   PlayCircle,
   Sparkles,
+  Video,
 } from "lucide-react";
 import type { Lesson, Progress } from "../data/lessons";
 import {
@@ -31,16 +40,16 @@ type Props = {
   onOpenProgress: () => void;
 };
 
-const SUBJECT_LIST = [
-  "Lịch sử",
-  "Địa lí",
-  "Ngữ văn",
-  "Toán",
-  "Tiếng Anh",
-  "Vật lí",
-  "Hóa học",
-  "Sinh học",
-];
+const SUBJECT_META = [
+  { name: "Lịch sử", tone: "amber", Icon: Landmark },
+  { name: "Địa lí", tone: "teal", Icon: Globe },
+  { name: "Ngữ văn", tone: "rose", Icon: BookMarked },
+  { name: "Toán", tone: "blue", Icon: Calculator },
+  { name: "Tiếng Anh", tone: "violet", Icon: Languages },
+  { name: "Vật lí", tone: "indigo", Icon: Atom },
+  { name: "Hóa học", tone: "purple", Icon: FlaskConical },
+  { name: "Sinh học", tone: "emerald", Icon: Dna },
+] as const;
 
 export default function LandingPage({
   lessons,
@@ -68,7 +77,7 @@ export default function LandingPage({
     <div className="landing-page">
       <section className="landing-hero" aria-labelledby="landing-title">
         <div className="landing-hero-body">
-          <p className="eyebrow">
+          <p className="eyebrow eyebrow-amber">
             <Sparkles size={14} aria-hidden="true" /> THƯ VIỆN HỌC TẬP SỐ THPT ·
             KẾT NỐI TRI THỨC VỚI CUỘC SỐNG
           </p>
@@ -89,7 +98,7 @@ export default function LandingPage({
             </button>
             {recentLesson ? (
               <button
-                className="secondary"
+                className="secondary btn-amber"
                 onClick={() =>
                   onOpenLesson(
                     recentLesson,
@@ -123,20 +132,24 @@ export default function LandingPage({
           <dl className="landing-metrics">
             <div>
               <dt>Môn học mở đầu</dt>
-              <dd>Lịch sử 12 ({published.length} bài mục lục)</dd>
+              <dd className="metric-badge metric-amber">
+                Lịch sử 12 ({published.length} bài)
+              </dd>
             </div>
             <div>
               <dt>Học liệu sẵn có</dt>
-              <dd>
-                {published.filter(hasReading).length} bài đọc mẫu ·{" "}
-                {published.filter(hasVideo).length} bài có video
+              <dd className="metric-badge metric-blue">
+                {published.filter(hasReading).length} bài đọc ·{" "}
+                {published.filter(hasVideo).length} video
               </dd>
             </div>
             <div>
               <dt>Tiến độ của bạn</dt>
-              <dd>
+              <dd
+                className={`metric-badge ${inProgressLessons.length > 0 ? "metric-emerald" : ""}`}
+              >
                 {inProgressLessons.length > 0
-                  ? `Đang học ${inProgressLessons.length} bài trên thiết bị này`
+                  ? `Đang học ${inProgressLessons.length} bài`
                   : "Chưa có bài đang học"}
               </dd>
             </div>
@@ -147,13 +160,13 @@ export default function LandingPage({
       <section className="landing-section" aria-labelledby="subjects-heading">
         <div className="landing-section-header">
           <div>
-            <span className="eyebrow">DANH MỤC THEO MÔN</span>
+            <span className="eyebrow eyebrow-violet">DANH MỤC THEO MÔN</span>
             <h2 id="subjects-heading">Chọn môn học Lớp 12</h2>
           </div>
           <p>Bấm vào môn học để mở danh sách bài trong Kho học liệu.</p>
         </div>
         <div className="landing-subject-grid">
-          {SUBJECT_LIST.map((subject) => {
+          {SUBJECT_META.map(({ name: subject, tone, Icon }) => {
             const subjectLessons = published.filter(
               (l) => l.subject === subject,
             );
@@ -164,14 +177,17 @@ export default function LandingPage({
               <button
                 key={subject}
                 type="button"
-                className={`landing-subject-card ${hasContent ? "has-content" : ""}`}
+                className={`landing-subject-card subject-${tone} ${hasContent ? "has-content" : ""}`}
                 onClick={() => onSelectSubject(subject)}
               >
                 <div className="landing-subject-top">
                   <strong>
-                    <BookOpen size={16} aria-hidden="true" /> {subject}
+                    <span className={`subject-icon icon-${tone}`}>
+                      <Icon size={18} aria-hidden="true" />
+                    </span>
+                    {subject}
                   </strong>
-                  <span>Lớp 12</span>
+                  <span className={`subject-grade badge-${tone}`}>Lớp 12</span>
                 </div>
                 <small>
                   {hasContent
@@ -187,7 +203,7 @@ export default function LandingPage({
       <section className="landing-section" aria-labelledby="featured-heading">
         <div className="landing-section-header">
           <div>
-            <span className="eyebrow">BẮT ĐẦU NGAY</span>
+            <span className="eyebrow eyebrow-emerald">BẮT ĐẦU NGAY</span>
             <h2 id="featured-heading">Bài học sẵn sàng trải nghiệm</h2>
           </div>
           <button className="secondary" onClick={onExploreCatalog}>
@@ -218,12 +234,29 @@ export default function LandingPage({
                     <strong>
                       {l.subject} {l.grade} · {lessonLabel(l)}
                     </strong>
-                    <small>
-                      {contentLabel(l)}
-                      {hasVideo(l) && hasReading(l) && " · Video tham khảo"}
-                      {l.questions.length > 0 &&
-                        ` · ${l.questions.length} câu luyện tập`}
-                      {summary.label && ` · ${summary.label}`}
+                    <small className="lesson-meta-tags">
+                      <span
+                        className={`meta-pill ${hasReading(l) ? "pill-blue" : "pill-rose"}`}
+                      >
+                        {contentLabel(l)}
+                      </span>
+                      {hasVideo(l) && hasReading(l) && (
+                        <span className="meta-pill pill-rose">
+                          <Video size={12} aria-hidden="true" /> Video tham khảo
+                        </span>
+                      )}
+                      {l.questions.length > 0 && (
+                        <span className="meta-pill pill-violet">
+                          {l.questions.length} câu luyện tập
+                        </span>
+                      )}
+                      {summary.label && (
+                        <span
+                          className={`meta-pill ${summary.state === "completed" ? "pill-emerald" : "pill-amber"}`}
+                        >
+                          {summary.label}
+                        </span>
+                      )}
                     </small>
                   </span>
                   <ArrowRight size={18} aria-hidden="true" />
@@ -237,13 +270,13 @@ export default function LandingPage({
       <section className="landing-section" aria-labelledby="steps-heading">
         <div className="landing-section-header">
           <div>
-            <span className="eyebrow">CÁCH SỬ DỤNG</span>
+            <span className="eyebrow eyebrow-teal">CÁCH SỬ DỤNG</span>
             <h2 id="steps-heading">Ba bước học tập trên hệ thống</h2>
           </div>
         </div>
         <div className="landing-steps-grid">
-          <div className="landing-step-card">
-            <span className="landing-step-num" aria-hidden="true">
+          <div className="landing-step-card step-blue">
+            <span className="landing-step-num num-blue" aria-hidden="true">
               1
             </span>
             <h3>Tìm bài theo sách giáo khoa</h3>
@@ -252,8 +285,8 @@ export default function LandingPage({
               số bài hoặc từ khóa nội dung.
             </p>
           </div>
-          <div className="landing-step-card">
-            <span className="landing-step-num" aria-hidden="true">
+          <div className="landing-step-card step-violet">
+            <span className="landing-step-num num-violet" aria-hidden="true">
               2
             </span>
             <h3>Đọc, nghe & hỏi đáp có trích dẫn</h3>
@@ -262,8 +295,8 @@ export default function LandingPage({
               khảo và tra cứu câu trả lời mở đúng đoạn nguồn.
             </p>
           </div>
-          <div className="landing-step-card">
-            <span className="landing-step-num" aria-hidden="true">
+          <div className="landing-step-card step-emerald">
+            <span className="landing-step-num num-emerald" aria-hidden="true">
               3
             </span>
             <h3>Luyện tập & lưu tiến độ</h3>
