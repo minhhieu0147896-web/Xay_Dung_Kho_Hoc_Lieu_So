@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useEffectEvent, useRef, useState } from "react";
+import Link from "next/link";
 import {
   ArrowLeft,
   ArrowRight,
@@ -16,6 +17,7 @@ import {
   LogOut,
   Settings,
   ShieldCheck,
+  Smartphone,
   Sparkles,
   Volume2,
   X,
@@ -696,6 +698,14 @@ export default function LearningApp() {
               Quản trị demo
             </button>
           )}
+          <Link
+            href="/mobile"
+            className="nav-item"
+            aria-label="Mở bản Mobile App dành cho học sinh khiếm thị"
+          >
+            <Smartphone size={18} aria-hidden="true" />
+            Mở bản Mobile App
+          </Link>
         </nav>
         <div className="sidebar-auth">
           {signedIn ? (

@@ -151,6 +151,7 @@ body {
   background: transparent;
   color: var(--muted);
   font-weight: 500;
+  text-decoration: none;
 }
 .textbook-app .nav-item:hover {
   background: var(--nav-active-bg);

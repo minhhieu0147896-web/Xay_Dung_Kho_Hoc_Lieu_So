@@ -42,6 +42,7 @@ export type Lesson = {
   youtubeSource?: string;
   videoUrl?: string;
   transcript?: string;
+  keywords?: string[];
   subject: string;
   grade: number;
   id: string;
@@ -79,4 +80,72 @@ export type Workspace = {
   published: Lesson[];
   drafts: Record<string, Draft>;
   previous: Record<string, Lesson>;
+};
+
+export type MobileSectionSummary = {
+  id: string;
+  code: string;
+  heading: string;
+  keywords: string[];
+};
+
+export type MobileLessonSummary = {
+  id: string;
+  lessonNumber?: number;
+  title: string;
+  subject: string;
+  grade: number;
+  chapter: string;
+  summary: string;
+  period?: string;
+  minutes?: number;
+  revision?: number;
+  sectionCount: number;
+  questionCount?: number;
+  hasReading: boolean;
+  hasVideo: boolean;
+  keywords: string[];
+  sectionSummaries?: MobileSectionSummary[];
+};
+
+export type MobileSectionDetail = {
+  id: string;
+  code: string;
+  heading: string;
+  body: string;
+  studyText: string;
+  sourceText?: string;
+  videoUrl?: string;
+  keywords: string[];
+};
+
+export type MobileLessonDetail = {
+  id: string;
+  lessonNumber?: number;
+  title: string;
+  subject: string;
+  grade: number;
+  chapter: string;
+  summary: string;
+  period?: string;
+  minutes?: number;
+  status: "published";
+  source?: string;
+  revision?: number;
+  videoUrl?: string;
+  youtubeVideoId?: string;
+  youtubeSource?: string;
+  transcript?: string;
+  hasReading: boolean;
+  hasVideo: boolean;
+  keywords: string[];
+  sections: MobileSectionDetail[];
+  questions: Question[];
+};
+
+export type MobileLessonListResponse = {
+  lessons: MobileLessonSummary[];
+  total: number;
+  readableCount: number;
+  generatedAt: string;
 };

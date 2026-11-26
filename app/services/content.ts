@@ -1,5 +1,13 @@
 import { z } from "zod";
-import type { Block, Lesson, Section, Workspace } from "../data/content";
+import type {
+  Block,
+  Lesson,
+  MobileLessonDetail,
+  MobileLessonSummary,
+  MobileSectionDetail,
+  Section,
+  Workspace,
+} from "../data/content";
 
 const id = z.string().regex(/^[a-zA-Z0-9][a-zA-Z0-9_-]{0,119}$/);
 const text = z.string().max(50000);
@@ -128,6 +136,7 @@ export const lessonSchema = z.object({
   youtubeSource: short.optional(),
   videoUrl: short.optional(),
   transcript: text.optional(),
+  keywords: z.array(short).max(50).optional(),
   sections: z
     .array(
       z.object({
@@ -409,4 +418,248 @@ export function appendText(
     provenance: { kind: "adaptation", title: fileName, edition: "", fileName },
     sections: [...lesson.sections, ...sections],
   });
+}
+
+function defaultSectionCode(
+  lessonNumber: number | undefined,
+  index: number,
+  explicitCode?: string,
+): string {
+  const trimmed = explicitCode?.trim();
+  if (trimmed) return trimmed;
+  const prefix =
+    typeof lessonNumber === "number" &&
+    Number.isFinite(lessonNumber) &&
+    lessonNumber > 0
+      ? Math.trunc(lessonNumber)
+      : 1;
+  return `${prefix}.${index + 1}`;
+}
+
+export function collectLessonKeywords(lesson: Lesson): string[] {
+  const seen = new Set<string>();
+  const result: string[] = [];
+  for (const raw of [
+    ...(lesson.keywords ?? []),
+    ...lesson.sections.flatMap((s) => s.keywords ?? []),
+  ]) {
+    const trimmed = raw.trim();
+    if (!trimmed) continue;
+    const key = trimmed.toLowerCase();
+    if (!seen.has(key)) {
+      seen.add(key);
+      result.push(trimmed);
+    }
+  }
+  return result;
+}
+
+function lessonHasReadableSections(lesson: Lesson): boolean {
+  return lesson.sections.some((s) => sectionText(s).trim().length > 0);
+}
+
+function lessonHasValidVideo(lesson: Lesson): boolean {
+  return (
+    /^[a-zA-Z0-9_-]{11}$/.test(lesson.youtubeVideoId ?? "") ||
+    Boolean(lesson.videoUrl?.trim())
+  );
+}
+
+export function toMobileLessonSummary(lesson: Lesson): MobileLessonSummary {
+  const lessonNumber = lesson.textbook?.lessonNumber;
+  return {
+    id: lesson.id,
+    lessonNumber,
+    title: lesson.title,
+    subject: lesson.subject,
+    grade: lesson.grade,
+    chapter: lesson.chapter,
+    summary: lesson.summary,
+    period: lesson.period || undefined,
+    minutes: lesson.minutes,
+    revision: lesson.revision,
+    sectionCount: lesson.sections.length,
+    questionCount: lesson.questions.length,
+    hasReading: lessonHasReadableSections(lesson),
+    hasVideo: lessonHasValidVideo(lesson),
+    keywords: collectLessonKeywords(lesson),
+    sectionSummaries: lesson.sections.map((section, index) => ({
+      id: section.id,
+      code: defaultSectionCode(lessonNumber, index, section.code),
+      heading: section.heading,
+      keywords: (section.keywords ?? []).map((k) => k.trim()).filter(Boolean),
+    })),
+  };
+}
+
+export function toMobileLessonDetail(lesson: Lesson): MobileLessonDetail {
+  const lessonNumber = lesson.textbook?.lessonNumber;
+  const sections: MobileSectionDetail[] = lesson.sections.map(
+    (section, index) => {
+      const studyText = sectionText(section).trim() || section.body.trim();
+      return {
+        id: section.id,
+        code: defaultSectionCode(lessonNumber, index, section.code),
+        heading: section.heading,
+        body: studyText,
+        studyText,
+        sourceText: section.sourceText,
+        videoUrl: section.videoUrl || undefined,
+        keywords: (section.keywords ?? []).map((k) => k.trim()).filter(Boolean),
+      };
+    },
+  );
+
+  return {
+    id: lesson.id,
+    lessonNumber,
+    title: lesson.title,
+    subject: lesson.subject,
+    grade: lesson.grade,
+    chapter: lesson.chapter,
+    summary: lesson.summary,
+    period: lesson.period || undefined,
+    minutes: lesson.minutes,
+    status: "published",
+    source: lesson.source || undefined,
+    revision: lesson.revision,
+    videoUrl: lesson.videoUrl || undefined,
+    youtubeVideoId: lesson.youtubeVideoId || undefined,
+    youtubeSource: lesson.youtubeSource || undefined,
+    transcript: lesson.transcript || undefined,
+    hasReading: lessonHasReadableSections(lesson),
+    hasVideo: lessonHasValidVideo(lesson),
+    keywords: collectLessonKeywords(lesson),
+    sections,
+    questions: lesson.questions,
+  };
+}
+
+export function toLessonFromMobileSummary(
+  summary: MobileLessonSummary,
+): Lesson {
+  return {
+    id: summary.id,
+    title: summary.title,
+    subject: summary.subject,
+    grade: summary.grade,
+    chapter: summary.chapter,
+    summary: summary.summary,
+    period: summary.period ?? "",
+    minutes: summary.minutes ?? 0,
+    status: "published",
+    source: "",
+    revision: summary.revision,
+    keywords: summary.keywords,
+    textbook:
+      typeof summary.lessonNumber === "number"
+        ? {
+            id: "ket-noi-tri-thuc",
+            title: "Kết nối tri thức với cuộc sống",
+            lessonNumber: summary.lessonNumber,
+          }
+        : undefined,
+    sections: (summary.sectionSummaries ?? []).map((sec) => ({
+      id: sec.id,
+      code: sec.code,
+      heading: sec.heading,
+      body: "",
+      keywords: sec.keywords,
+    })),
+    questions: [],
+  };
+}
+
+export function toLessonFromMobileDetail(detail: MobileLessonDetail): Lesson {
+  return materialize({
+    id: detail.id,
+    title: detail.title,
+    subject: detail.subject,
+    grade: detail.grade,
+    chapter: detail.chapter,
+    summary: detail.summary,
+    period: detail.period ?? "",
+    minutes: detail.minutes ?? 0,
+    status: "published",
+    source: detail.source ?? "",
+    revision: detail.revision,
+    videoUrl: detail.videoUrl,
+    youtubeVideoId: detail.youtubeVideoId,
+    youtubeSource: detail.youtubeSource,
+    transcript: detail.transcript,
+    keywords: detail.keywords,
+    textbook:
+      typeof detail.lessonNumber === "number"
+        ? {
+            id: "ket-noi-tri-thuc",
+            title: "Kết nối tri thức với cuộc sống",
+            lessonNumber: detail.lessonNumber,
+          }
+        : undefined,
+    sections: detail.sections.map((sec) => ({
+      id: sec.id,
+      code: sec.code,
+      heading: sec.heading,
+      sourceText: sec.sourceText,
+      body: sec.studyText || sec.body,
+      videoUrl: sec.videoUrl,
+      keywords: sec.keywords,
+    })),
+    questions: detail.questions,
+  });
+}
+
+export function mergeMobileLessonsWithLocal(
+  apiSummaries: MobileLessonSummary[],
+  localPublished: Lesson[],
+): {
+  summaries: MobileLessonSummary[];
+  lessons: Lesson[];
+} {
+  const validLocal = localPublished.filter((l) => l.status === "published");
+  const localMap = new Map(validLocal.map((l) => [l.id, l]));
+
+  const summaries: MobileLessonSummary[] = apiSummaries.map((apiItem) => {
+    const local = localMap.get(apiItem.id);
+    if (local && (local.revision ?? 0) > (apiItem.revision ?? 0)) {
+      return toMobileLessonSummary(local);
+    }
+    return apiItem;
+  });
+
+  for (const local of validLocal) {
+    if (!apiSummaries.some((apiItem) => apiItem.id === local.id)) {
+      summaries.push(toMobileLessonSummary(local));
+    }
+  }
+
+  const lessons: Lesson[] = summaries.map((summary) => {
+    const local = localMap.get(summary.id);
+    if (local) {
+      if ((local.revision ?? 0) > (summary.revision ?? 0)) {
+        return local;
+      }
+      return {
+        ...local,
+        title: summary.title,
+        summary: summary.summary,
+        chapter: summary.chapter,
+      };
+    }
+    return toLessonFromMobileSummary(summary);
+  });
+
+  return { summaries, lessons };
+}
+
+export function resolveMobileLessonDetail(
+  apiDetail: MobileLessonDetail | null,
+  localLesson?: Lesson,
+): MobileLessonDetail | null {
+  if (localLesson && localLesson.status === "published") {
+    if (!apiDetail || (localLesson.revision ?? 0) > (apiDetail.revision ?? 0)) {
+      return toMobileLessonDetail(localLesson);
+    }
+  }
+  return apiDetail;
 }

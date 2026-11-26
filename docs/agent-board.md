@@ -6,23 +6,26 @@
 ---
 
 ## 1. Trạng thái hiện tại
-- **Giai đoạn:** Giai đoạn 2 — Cấu trúc hóa học liệu bằng AI & Học tập tiếp cận cho học sinh khiếm thị + Cải tiến Giao diện (UI/UX) Chuẩn Web Học Tập Hiện Đại
-- **Lượt chạy đang thực hiện:** Lượt chạy 5B (Cải tiến UI/UX Không gian Giáo viên — Tab `"Bảng mục lục & AI"`) — **HOÀN THÀNH & ĐÃ NGHIỆM THU (`STATUS: PASS`)** (Toàn bộ Lượt chạy 1, 2, 3, 4, 5A và 5B đã `STATUS: PASS`)
-- **Trạng thái kiểm chứng gần nhất:** `npx tsc --noEmit` (`0` lỗi), `npm run lint` (`0` lỗi, `0` cảnh báo), `npm run build` (`PASS`), `npm test` (`14` đạt, `0` lỗi, `4` bỏ qua)
+- **Giai đoạn:** Giai đoạn 2 — Cấu trúc hóa học liệu bằng AI, Học tập tiếp cận & Bản Demo Mobile App chuyên biệt cho học sinh khiếm thị (`PWA /mobile` & `Mobile API`)
+- **Lượt chạy đang thực hiện:** Lượt chạy 6 (Mobile App Demo cho người khiếm thị — `PWA /mobile` & `Mobile REST API`) — **HOÀN THÀNH & ĐÃ NGHIỆM THU (`STATUS: PASS`)** *(Toàn bộ Lượt chạy 1, 2, 3, 4, 5A, 5B và 6 đã `STATUS: PASS`)*
+- **Trạng thái kiểm chứng gần nhất (Nghiệm thu Ticket 6B):** `npm run lint` (`0` lỗi, `0` cảnh báo), `npx tsc --noEmit` (`0` lỗi), `npm run build` (`PASS`), `npm test` (`14` đạt, `0` lỗi, `4` bỏ qua)
 
 ---
 
 ## 2. Phân chia phạm vi file (Chống xung đột)
-- **Argon chủ lực (Tech Lead · Schema · AI Backend · Review):**
+- **Argon chủ lực (Tech Lead · Schema · AI/Mobile Backend · PWA Manifest · Review):**
   - `app/data/content.ts`
   - `app/services/content.ts`
+  - `app/manifest.ts`
   - `app/api/ai-assistant/route.ts`
   - `app/api/import-document/route.ts`
+  - `app/api/mobile/**`
   - `docs/**`
-- **Gemini (Frontend UI · Tiếp cận A11y · Dữ liệu học liệu):**
+- **Gemini (Frontend UI · Tiếp cận A11y · Mobile UI `/mobile` · Dữ liệu học liệu):**
+  - `app/mobile/**`
   - `app/components/**`
   - `app/services/learning.ts`
-  - `app/study.css`, `app/globals.css`
+  - `app/study.css`, `app/mobile.css`, `app/globals.css`
   - `content/lich-su/**`
 
 ---
@@ -75,12 +78,22 @@
 
 ---
 
-### Lượt chạy 5B — Thiết kế lại Không gian Giáo viên (`Bảng mục lục & AI` — Split-View Section Cards & Xem mục lục rút gọn) `[ĐANG THỰC HIỆN - ĐÃ XONG TICKET 5B-1]`
+### Lượt chạy 5B — Thiết kế lại Không gian Giáo viên (`Bảng mục lục & AI` — Split-View Section Cards & Xem mục lục rút gọn) `[HOÀN THÀNH - STATUS: PASS]`
 - **Ticket 5B-1 (`Argon chủ lực`) — `[HOÀN THÀNH]`:**
   - Giữ nguyên 100% Schema, Service và API (`app/data/content.ts`, `app/services/content.ts`, `app/api/*`) — bảo toàn tương thích ngược `suhoc-content-v2`.
   - Rà soát toàn bộ tab `"Bảng mục lục & AI"` trong `app/components/lesson-editor.tsx` và các lớp CSS biên tập trong `app/study.css`; chốt Hợp đồng Thiết kế & Phiếu bàn giao Ticket 5B-2 tại Mục 4.9.
-- **Ticket 5B-2 (`Gemini UI & Học liệu`) — `[ĐANG CHỜ THỰC HIỆN]`:**
-  - Cải tổ giao diện tab `"Bảng mục lục & AI"` trong `app/components/lesson-editor.tsx` và `app/study.css` từ bảng 6 cột ngang chật hẹp sang danh sách **Thẻ cấu trúc so sánh 2 cột (Split-View Section Cards)** kèm nút chuyển đổi nhanh **"Xem mục lục rút gọn"** (bảng 2 cột Mã mục + Tiêu đề).
+- **Ticket 5B-2 (`Gemini UI & Học liệu`) — `[HOÀN THÀNH - ĐÃ NGHIỆM THU]`:**
+  - Đã cải tổ giao diện tab `"Bảng mục lục & AI"` trong `app/components/lesson-editor.tsx` và `app/study.css` sang danh sách **Thẻ cấu trúc so sánh 2 cột (Split-View Section Cards)** kèm nút chuyển đổi nhanh **"Xem mục lục rút gọn"**.
+
+---
+
+### Lượt chạy 6 — Mobile App Demo chuyên biệt cho học sinh khiếm thị (`PWA /mobile` & `Mobile REST API`) `[HOÀN THÀNH - STATUS: PASS]`
+- **Ticket 6A (`Argon chủ lực`) — `[HOÀN THÀNH]`:**
+  - Tạo `app/manifest.ts` (Next.js App Router Metadata Manifest) cấu hình PWA `"Học Liệu Số - App Khiếm Thị"` (`start_url: "/mobile"`, `display: "standalone"`, `lang: "vi"`, `background_color: "#ffffff"`, `theme_color: "#1e5480"`).
+  - Mở rộng kiểu DTO & hàm đồng bộ Mobile trong `app/data/content.ts` và `app/services/content.ts` (tất cả trường mới trong `Lesson`/`Section` đều `optional`, tương thích ngược 100% với `suhoc-content-v2`).
+  - Tạo 2 Route Handler REST API chuẩn Next.js 16 (`Cache-Control: no-store, no-cache, must-revalidate`, `params` kiểu `Promise`): `GET /api/mobile/lessons` và `GET /api/mobile/lessons/[id]`.
+- **Ticket 6B (`Gemini UI & Học liệu`) — `[HOÀN THÀNH - ĐÃ NGHIỆM THU]`:**
+  - Đã tạo trang `app/mobile/page.tsx`, component `app/components/mobile-blind-app.tsx` và bảng kiểu tách biệt `app/mobile.css` gồm 4 màn hình điều hướng đáy (`Trang chủ Giọng nói`, `Đang học`, `Hỏi AI`, `Luyện tập`), hợp nhất dữ liệu `/api/mobile/lessons` & `/api/mobile/lessons/[id]` với `localStorage` (`suhoc-content-v2`), và thêm liên kết `"Mở bản Mobile App"` (`/mobile`) trên thanh điều hướng `app/components/learning-app.tsx`.
 
 ---
 
@@ -501,6 +514,241 @@ export type InsertImageSemanticResponse = {
 
 ---
 
+### 4.10. Hợp đồng TypeScript, PWA Manifest & Mobile REST API — Lượt chạy 6 (Ticket 6A → Ticket 6B)
+
+#### A. Cấu hình PWA Manifest (`app/manifest.ts` → `/manifest.webmanifest`)
+- Chuẩn Next.js 16 `MetadataRoute.Manifest`:
+  - `name`: `"Học Liệu Số - App Khiếm Thị"`
+  - `short_name`: `"Học Liệu Số"`
+  - `start_url`: `"/mobile"`
+  - `display`: `"standalone"`
+  - `lang`: `"vi"`
+  - `background_color`: `"#ffffff"`
+  - `theme_color`: `"#1e5480"`
+  - `orientation`: `"portrait"`
+
+#### B. Kiểu dữ liệu TypeScript (`app/data/content.ts`) & Hàm đồng bộ (`app/services/content.ts`)
+- Giữ tương thích ngược 100% với `suhoc-content-v2` và `suhoc-progress-v1` (chỉ bổ sung `keywords?: string[]` dạng `optional` vào `Lesson` & `lessonSchema`).
+- Các kiểu DTO xuất sẵn từ `app/data/content.ts`:
+```ts
+export type MobileSectionSummary = {
+  id: string;
+  code: string;
+  heading: string;
+  keywords: string[];
+};
+
+export type MobileLessonSummary = {
+  id: string;
+  lessonNumber?: number;
+  title: string;
+  subject: string;
+  grade: number;
+  chapter: string;
+  summary: string;
+  period?: string;
+  minutes?: number;
+  revision?: number;
+  sectionCount: number;
+  questionCount?: number;
+  hasReading: boolean;
+  hasVideo: boolean;
+  keywords: string[];
+  sectionSummaries?: MobileSectionSummary[];
+};
+
+export type MobileSectionDetail = {
+  id: string;
+  code: string;
+  heading: string;
+  body: string;      // Văn bản Nội dung học đã chuẩn hóa (đồng bộ với studyText)
+  studyText: string; // Văn bản Nội dung học đã chuẩn hóa để đọc TTS & gửi ask_lesson
+  sourceText?: string;
+  videoUrl?: string;
+  keywords: string[];
+};
+
+export type MobileLessonDetail = {
+  id: string;
+  lessonNumber?: number;
+  title: string;
+  subject: string;
+  grade: number;
+  chapter: string;
+  summary: string;
+  period?: string;
+  minutes?: number;
+  status: "published";
+  source?: string;
+  revision?: number;
+  videoUrl?: string;
+  youtubeVideoId?: string;
+  youtubeSource?: string;
+  transcript?: string;
+  hasReading: boolean;
+  hasVideo: boolean;
+  keywords: string[];
+  sections: MobileSectionDetail[];
+  questions: Question[];
+};
+
+export type MobileLessonListResponse = {
+  lessons: MobileLessonSummary[];
+  total: number;
+  readableCount: number;
+  generatedAt: string;
+};
+```
+- **Các hàm tiện ích dùng chung cho Client Mobile App (`app/services/content.ts`):**
+  1. `toMobileLessonSummary(lesson: Lesson): MobileLessonSummary`
+  2. `toMobileLessonDetail(lesson: Lesson): MobileLessonDetail`
+  3. `toLessonFromMobileSummary(summary: MobileLessonSummary): Lesson`
+  4. `toLessonFromMobileDetail(detail: MobileLessonDetail): Lesson` *(dùng để truyền vào `findBestMatchingSection(toLessonFromMobileDetail(detail), query)` từ `app/services/learning.ts`)*
+  5. `mergeMobileLessonsWithLocal(apiSummaries: MobileLessonSummary[], localPublished: Lesson[]): { summaries: MobileLessonSummary[]; lessons: Lesson[] }`:
+     - Tự động hợp nhất danh sách từ `GET /api/mobile/lessons` với `workspace.published` đọc từ `localStorage` (`suhoc-content-v2` qua `restoreWorkspace`): bài nào giáo viên vừa sửa và **Công bố** cục bộ (`revision` cao hơn hoặc bài mới thêm) sẽ ghi đè ngay lập tức; đồng thời trả về mảng `lessons: Lesson[]` đầy đủ từ khóa & mục lục để truyền thẳng vào `semanticSearchLessons(lessons, transcript)` kể cả khi `localStorage` trống.
+  6. `resolveMobileLessonDetail(apiDetail: MobileLessonDetail | null, localLesson?: Lesson): MobileLessonDetail | null`:
+     - Hợp nhất chi tiết bài học từ `GET /api/mobile/lessons/[id]` với bản đã công bố trong `suhoc-content-v2` (ưu tiên bản giáo viên vừa công bố cục bộ có `revision` mới hơn, hoặc fallback sang bản cục bộ nếu offline/lỗi mạng).
+
+#### C. Hợp đồng 2 Endpoint Mobile REST API (`Cache-Control: no-store, no-cache, must-revalidate`)
+
+1. **Endpoint 1 — Danh sách bài học đã công bố: `GET /api/mobile/lessons`**
+   - **File:** `app/api/mobile/lessons/route.ts`
+   - **Query params tùy chọn:** `?subject=Lịch%20sử`, `?grade=12`, `?onlyReadable=true`, `?q=cây%20đa%20Tân%20Trào`.
+   - **JSON Response thành công (`200 OK`) mẫu:**
+   ```json
+   {
+     "lessons": [
+       {
+         "id": "cach-mang-thang-tam",
+         "lessonNumber": 6,
+         "title": "Cách mạng tháng Tám năm 1945",
+         "subject": "Lịch sử",
+         "grade": 12,
+         "chapter": "Chủ đề 3. Cách mạng tháng Tám năm 1945, chiến tranh giải phóng dân tộc và chiến tranh bảo vệ Tổ quốc trong lịch sử Việt Nam (từ tháng 8 năm 1945 đến nay)",
+         "summary": "Tìm hiểu bối cảnh, lễ xuất quân dưới cây đa Tân Trào, diễn biến Tổng khởi nghĩa tháng Tám năm 1945 (Hà Nội, Huế, Sài Gòn), Tuyên ngôn Độc lập và ý nghĩa lịch sử.",
+         "period": "1945",
+         "minutes": 12,
+         "sectionCount": 3,
+         "questionCount": 3,
+         "hasReading": true,
+         "hasVideo": true,
+         "keywords": [
+           "bối cảnh lịch sử",
+           "Nhật Bản đầu hàng Đồng minh",
+           "Quân lệnh số 1",
+           "cây đa Tân Trào",
+           "Võ Nguyên Giáp",
+           "Tổng khởi nghĩa tháng Tám",
+           "Tuyên ngôn Độc lập"
+         ],
+         "sectionSummaries": [
+           {
+             "id": "thang-tam-boi-canh",
+             "code": "6.1",
+             "heading": "Bối cảnh lịch sử và thời cơ",
+             "keywords": ["cây đa Tân Trào", "Quân lệnh số 1", "16/8/1945"]
+           }
+         ]
+       }
+     ],
+     "total": 17,
+     "readableCount": 2,
+     "generatedAt": "2026-11-26T03:18:00.000Z"
+   }
+   ```
+
+2. **Endpoint 2 — Chi tiết 1 bài học đã công bố: `GET /api/mobile/lessons/[id]`**
+   - **File:** `app/api/mobile/lessons/[id]/route.ts` *(tuân thủ Next.js 16: `context: { params: Promise<{ id: string }> }`, dùng `await context.params`)*
+   - **Mã phản hồi:** `200 OK` (`MobileLessonDetail`), `400 Bad Request` (`{ "error": "Mã bài học không hợp lệ." }`), `404 Not Found` (`{ "error": "Không tìm thấy bài học đã công bố tương ứng." }`).
+   - **JSON Response thành công (`200 OK`) mẫu (`GET /api/mobile/lessons/cach-mang-thang-tam`):**
+   ```json
+   {
+     "id": "cach-mang-thang-tam",
+     "lessonNumber": 6,
+     "title": "Cách mạng tháng Tám năm 1945",
+     "subject": "Lịch sử",
+     "grade": 12,
+     "chapter": "Chủ đề 3...",
+     "summary": "Tìm hiểu bối cảnh, lễ xuất quân dưới cây đa Tân Trào, diễn biến Tổng khởi nghĩa tháng Tám năm 1945 (Hà Nội, Huế, Sài Gòn), Tuyên ngôn Độc lập và ý nghĩa lịch sử.",
+     "period": "1945",
+     "minutes": 12,
+     "status": "published",
+     "source": "Văn bản diễn giải do demo biên soạn...",
+     "youtubeVideoId": "9w2x3y4z5a6",
+     "hasReading": true,
+     "hasVideo": true,
+     "keywords": ["cây đa Tân Trào", "Quân lệnh số 1", "Tổng khởi nghĩa tháng Tám"],
+     "sections": [
+       {
+         "id": "thang-tam-boi-canh",
+         "code": "6.1",
+         "heading": "Bối cảnh lịch sử và thời cơ",
+         "body": "Tháng 8 năm 1945, Nhật Bản đầu hàng Đồng minh... [Mô tả ảnh tư liệu: Dưới tán cây đa Tân Trào cổ thụ...]",
+         "studyText": "Tháng 8 năm 1945, Nhật Bản đầu hàng Đồng minh... [Mô tả ảnh tư liệu: Dưới tán cây đa Tân Trào cổ thụ...]",
+         "sourceText": "Văn bản đối chiếu mẫu...",
+         "keywords": ["bối cảnh lịch sử", "cây đa Tân Trào", "Quân lệnh số 1"]
+       }
+     ],
+     "questions": [
+       {
+         "id": "a1",
+         "prompt": "Sự kiện quốc tế nào tạo thời cơ cho tổng khởi nghĩa tháng 8 năm 1945?",
+         "options": [
+           "Nhật Bản đầu hàng Đồng minh",
+           "Liên minh châu Âu thành lập",
+           "Chiến tranh lạnh kết thúc"
+         ],
+         "correctOptionId": 0,
+         "explanation": "Nhật Bản đầu hàng Đồng minh khiến chính quyền thân Nhật ở Đông Dương khủng hoảng.",
+         "sourceSectionId": "thang-tam-boi-canh"
+       }
+     ]
+   }
+   ```
+   - **Lưu ý tích hợp `ask_lesson`:** `MobileSectionDetail` đã chuẩn hóa sẵn `{ id, code, heading, body, studyText, sourceText, keywords }` khớp 100% với `askLessonSectionItemSchema` của `POST /api/ai-assistant`, nên màn hình **Hỏi AI** truyền trực tiếp `sections: currentLessonDetail.sections` lên `POST /api/ai-assistant` (`action: "ask_lesson"`).
+
+#### D. Phiếu bàn giao chi tiết cho Gemini UI & Học liệu (Ticket 6B)
+1. **Danh sách chính xác file Gemini được phép tạo/sửa trong Ticket 6B:**
+   - `[NEW]` `app/mobile/page.tsx` (Server Component gọn sạch có `metadata` riêng cho `/mobile`, render `<MobileBlindApp />`)
+   - `[NEW]` `app/components/mobile-blind-app.tsx` (`"use client"` — giao diện Voice-first / Audio-first cho học sinh khiếm thị)
+   - `[NEW hoặc MODIFY]` `app/mobile.css` (hoặc bổ sung nhóm class `.mobile-app-*` tách biệt trong `app/study.css` — không làm ảnh hưởng CSS của giao diện `/` hiện tại)
+   - `[MODIFY]` `app/components/learning-app.tsx` (thêm đúng 1 liên kết gọn `<a href="/mobile">` với nhãn `"Mở bản Mobile App"` trên thanh điều hướng `.sidebar` để chuyển nhanh sang bản demo Mobile App)
+   - `[MODIFY]` `docs/agent-board.md` (cập nhật báo cáo bàn giao vào Mục 5)
+
+2. **Yêu cầu chức năng, bố cục & luồng dữ liệu cụ thể:**
+   - **Khung Mobile App & Thanh công cụ trên cùng:**
+     - Toàn màn hình (`100dvh` / `min-height: 100vh`) khi mở trên điện thoại; khi mở trên máy tính (`min-width: 520px`), căn giữa dạng khung điện thoại `max-width: 460px` có viền bo nhẹ, đổ bóng tinh tế trên nền xám nhạt để giảng viên quan sát trực quan như một ứng dụng di động độc lập.
+     - Góc trên cùng có nút bật/tắt nhanh **`Tương phản cao`** (`aria-pressed`) và **`Chữ lớn`** (`aria-pressed`), lưu/khôi phục từ `localStorage` (ví dụ khóa `suhoc-mobile-prefs-v1`), kèm liên kết nhỏ quay về Web Kho học liệu (`/`).
+   - **Đồng bộ dữ liệu API + `localStorage` (`suhoc-content-v2`):**
+     - Khi khởi chạy: gọi `fetch("/api/mobile/lessons", { cache: "no-store" })` đồng thời đọc `localStorage.getItem("suhoc-content-v2")` qua `restoreWorkspace` (bọc `try/catch` an toàn, fallback sang `mergeStoredLessons` nếu có `suhoc-lessons-v1`).
+     - Dùng hàm `mergeMobileLessonsWithLocal(apiData.lessons, localPublished)` trong `app/services/content.ts` để hợp nhất danh sách bài và tạo mảng `lessons: Lesson[]` phục vụ tìm kiếm ngữ nghĩa.
+     - Khi mở 1 bài học `id`: gọi `fetch(\`/api/mobile/lessons/\${encodeURIComponent(id)}\`, { cache: "no-store" })` và kết hợp với `resolveMobileLessonDetail(apiDetail, localLesson)` để bài giáo viên vừa sửa và **Công bố** bên tab Giáo viên hiện ngay lập tức trên `/mobile`.
+   - **Thanh điều hướng đáy 4 màn hình lớn (`<nav aria-label="Điều hướng ứng dụng di động">`):**
+     - 4 nút tab cỡ lớn (`min-height: 60px`, rõ nhãn tiếng Việt + `aria-current="page"` hoặc `role="tab"` chuẩn): **`Trang chủ Giọng nói`** · **`Đang học`** · **`Hỏi AI`** · **`Luyện tập`**.
+     - **(a) Trang chủ Giọng nói:**
+       - Nút Micro trung tâm khổng lồ (`min-height: 96px`, `aria-pressed`, `aria-label` rõ ràng) **"Chạm để nói bài muốn học"** dùng Web Speech Recognition API (`vi-VN`). Trước khi bật micro phải tự động ngắt TTS đang đọc (`window.speechSynthesis.cancel()`).
+       - Kết hợp `semanticSearchLessons(mergedLessons, transcript)` + sau khi nạp chi tiết bài khớp nhất dùng `findBestMatchingSection(toLessonFromMobileDetail(detail), transcript)`: khi học sinh nói *"Tổng khởi nghĩa tháng Tám"*, *"Cây đa Tân Trào"*, *"Đổi mới"* (hoặc *"Tuyên ngôn Độc lập"*), ứng dụng đọc thông báo TTS xác nhận và **tự chuyển thẳng sang màn hình `Đang học` đúng mục đó**.
+       - Có ô nhập chữ dự phòng (kèm nút Tìm) cho trình duyệt không hỗ trợ SpeechRecognition và danh sách bài học có nội dung đọc rút gọn chữ to, dễ chạm (`min-height: 56px`).
+     - **(b) Màn hình Đang học (Audio Book Player):**
+       - Hiển thị rõ tên bài, tiến độ mục (`Mục 1/3 · Mã mục 6.1`) và tiêu đề mục hiện tại.
+       - Cụm 3 nút điều khiển khổng lồ (`min-height: 56px`): **`[Mục trước]`** · **`[Nghe / Tạm dừng]`** · **`[Mục sau]`**, kèm nút **`Nghe tóm tắt`** và dãy nút/bộ chọn tốc độ đọc (**`0.8×` / `1×` / `1.2×` / `1.5×`**).
+       - Hiển thị văn bản `Nội dung học` (`section.studyText || section.body`) cỡ chữ lớn (`>= 18px`, `line-height: 1.75`), dễ đọc; lưu tiến độ mục đã nghe/đọc vào `suhoc-progress-v1` (nếu phù hợp, giữ nguyên cấu trúc `Progress` hiện có).
+     - **(c) Màn hình Hỏi AI bằng giọng nói:**
+       - Có nút bấm lớn **Nói câu hỏi** (Web Speech API `vi-VN`) và ô gõ câu hỏi dự phòng → gửi `POST /api/ai-assistant` với `{ action: "ask_lesson", question, lessonId: detail.id, lessonTitle: detail.title, sections: detail.sections }` (nếu lỗi mạng thì fallback sang `askLesson(toLessonFromMobileDetail(detail), question)`).
+       - Khi có câu trả lời: tự động đọc câu trả lời bằng TTS (có nút Dừng đọc / Nghe lại), ghi rõ nguồn trả lời (`Trợ giảng AI` hay `Truy hồi đoạn nguồn`) và hiển thị các nút trích dẫn `citations` cỡ lớn để bấm nhảy thẳng về đúng mục nguồn ở màn hình **`Đang học`**.
+     - **(d) Màn hình Luyện tập Âm thanh (Audio Quiz):**
+       - Nút lớn **"Đọc câu hỏi & 4 đáp án"** (hoặc đọc theo số đáp án thực tế `question.options.length`) bằng TTS (đọc rõ câu hỏi và từng phương án `A, B, C, D...` — lưu ý câu hỏi mẫu có thể có 3 hoặc 4 phương án, câu hỏi AI sinh có 4 phương án, nên render động theo `question.options.map(...)`).
+       - Các nút chọn đáp án siêu lớn (`min-height: 56px`, toàn chiều ngang), chạm chọn/nộp là đọc to kết quả **Đúng / Chưa đúng** kèm lời giải thích (`explanation`) qua TTS và cập nhật thông báo `role="status"`. Có nút chuyển Câu trước / Câu tiếp theo và tổng kết điểm.
+
+3. **Các điểm cấm chạm vào & Điều kiện biên bắt buộc:**
+   - **KHÔNG** chỉnh sửa `app/data/content.ts`, `app/services/content.ts`, `app/manifest.ts`, `app/api/**`, `tests/**`.
+   - **KHÔNG** đưa khóa bí mật (`OPENROUTER_API_KEY`) vào mã client; mọi yêu cầu hỏi đáp AI đi qua `POST /api/ai-assistant`.
+   - Đảm bảo không chồng chéo âm thanh: bấm Micro thu âm phải dừng TTS ngay; chuyển bài/mục hoặc rời trang `/mobile` (`unmount`) phải gọi `speechSynthesis.cancel()` và dừng `SpeechRecognition` đang mở.
+   - Tuân thủ WCAG 2.2 AA: điều hướng bàn phím đầy đủ, vòng `:focus-visible` `3px solid #1d4ed8` rõ nét, đầy đủ `aria-label` tiếng Việt, vùng thông báo trực tiếp `role="status"` / `aria-live="polite"`, hỗ trợ hoàn chỉnh 2 chế độ `Tương phản cao` và `Chữ lớn`, không tràn ngang ở `320px–390px`.
+   - Trước khi bàn giao lại cho `Argon chủ lực`: chạy thực tế `npx tsc --noEmit`, `npm run lint` và `npm test` đảm bảo `0` lỗi và `14/14` test PASS.
+
+---
+
 ## 5. Báo cáo bàn giao từ Gemini
 - **2026-11-24 (Ticket 1B — Bảng mục lục & AI cho Giáo viên):** Đã hoàn thành và đạt nghiệm thu ở Lượt chạy 1 (`STATUS: PASS`).
 - **2026-11-24 (Ticket 2B — 3 nút AI theo từng dòng Bảng mục lục & Video URL đa nguồn):** Đã hoàn thành và đạt nghiệm thu ở Lượt chạy 2 (`STATUS: PASS`).
@@ -551,6 +799,21 @@ export type InsertImageSemanticResponse = {
       - Thêm hệ CSS cho `.outline-cards-list`, `.outline-section-card`, `.outline-card-header`, `.outline-card-split` (`repeat(2, minmax(0, 1fr))`, chuyển về `1fr` ở `<= 900px`), `.outline-split-col.is-source` / `.is-study`, `.outline-card-footer`, `.outline-card-video`, `.outline-card-ai-bar`, `.outline-view-toggle[aria-pressed="true"]` và `.outline-compact-table`.
       - Đồng bộ hoàn chỉnh chế độ **Tương phản cao** (`.high-contrast`: nền `#ffffff`, chữ `#000000`, viền `2px solid #0f172a`, `box-shadow: none`), chế độ **Chữ lớn** (`.large-type`), vùng bấm `min-height: 44px`, vòng `:focus-visible` (`3px solid #1d4ed8`) và responsive `<= 900px` / `<= 760px` / `360px`.
   - **Kiểm chứng:** `npx tsc --noEmit` (`0` lỗi), `npm run lint` (`0` lỗi, `0` cảnh báo), `npm test` (`14` đạt, `0` lỗi, `4` bỏ qua). Chưa kiểm thử trực quan trên trình duyệt/NVDA và chưa chạy `npm run build` (bàn giao `Argon chủ lực` Review & build).
+- **2026-11-26 (Ticket 6B — Mobile App Demo Voice-first / Audio-first `/mobile` cho học sinh khiếm thị):**
+  - **Các file đã tạo/chỉnh sửa (đúng phạm vi Ticket 6B):**
+    - `[NEW]` `app/mobile/page.tsx`: Server Component khai báo `metadata` riêng cho `/mobile` (`"Học Liệu Số - App Khiếm Thị"`), nạp `app/mobile.css` tách biệt khỏi `/` và render `<MobileBlindApp />`.
+    - `[NEW]` `app/components/mobile-blind-app.tsx`: Client Component giao diện Voice-first / Audio-first:
+      - Khung ứng dụng di động căn giữa `max-width: 460px` trên desktop và toàn màn hình (`100dvh`) trên điện thoại; thanh đầu trang có lối về **Bản Web** (`/`), nút bật/tắt nhanh **Chữ lớn** và **Tương phản cao** (`aria-pressed`, lưu `suhoc-mobile-prefs-v1`) cùng vùng thông báo trạng thái `role="status"` / `aria-live="polite"`.
+      - Đồng bộ dữ liệu từ `GET /api/mobile/lessons` và `GET /api/mobile/lessons/[id]` (`cache: "no-store"`) kết hợp `localStorage` (`suhoc-content-v2` qua `restoreWorkspace`, fallback `suhoc-lessons-v1`) bằng `mergeMobileLessonsWithLocal` và `resolveMobileLessonDetail` để bài giáo viên vừa công bố hiện ngay.
+      - Thanh điều hướng đáy 4 nút cỡ lớn (`min-height: 64px`, `aria-current="page"`):
+        1. **Trang chủ Giọng nói:** Nút Micro trung tâm khổng lồ (`min-height: 104px`, Web Speech API `vi-VN`, tự ngắt TTS trước khi thu âm), nối `semanticSearchLessons` + `findBestMatchingSection` để nói tên bài/sự kiện (*Tổng khởi nghĩa tháng Tám*, *Cây đa Tân Trào*, *Đổi mới*) là tự mở thẳng sang màn hình **Đang học** đúng mục khớp nhất kèm thông báo TTS; có ô nhập chữ dự phòng, nút câu mẫu nhanh và danh sách bài rút gọn chữ to.
+        2. **Đang học (Audio Book Player):** Hiển thị tên bài, tiến độ mục (`Mục 1/3 · Mã mục 6.1`), cụm 3 nút lớn `[Mục trước]` · `[Nghe mục / Tạm dừng / Tiếp tục]` · `[Mục sau]`, nút **Nghe tóm tắt**, nút **Dừng đọc**, bộ chọn tốc độ (`0.8× / 1× / 1.2× / 1.5×`), nút đánh dấu hoàn thành mục đồng bộ `suhoc-progress-v1`, văn bản `Nội dung học` cỡ lớn (`18px+`, `line-height: 1.75`) và hộp `<details>` đối chiếu SGK.
+        3. **Hỏi AI:** Nút nói câu hỏi bằng giọng nói + ô nhập dự phòng → gọi `POST /api/ai-assistant` (`action: "ask_lesson"`, truyền trực tiếp `sections: activeLesson.sections`, fallback `askLesson` cục bộ khi lỗi mạng), tự động đọc câu trả lời bằng TTS, phân biệt rõ nhãn `Trợ giảng AI (OpenRouter)` và `Truy hồi đoạn nguồn (Bộ xử lý cục bộ)`, kèm nút trích dẫn nhảy thẳng về mục nguồn trên màn hình **Đang học** và câu hỏi gợi ý.
+        4. **Luyện tập (Audio Quiz):** Nút lớn **"Đọc câu hỏi & N đáp án"** bằng TTS (render động theo `question.options.length` cho cả câu 3 lựa chọn lẫn 4 lựa chọn), nút chọn đáp án siêu lớn (`min-height: 58px`), chọn xong tự động đọc to kết quả Đúng/Chưa đúng + lời giải thích, đồng bộ điểm vào `suhoc-progress-v1`, có nút chuyển câu, nghe lại giải thích và nhảy về mục nguồn.
+      - Đảm bảo sạch âm thanh: ngắt `speechSynthesis` và dừng `SpeechRecognition` khi chuyển tab, đổi bài/mục, bật micro hoặc rời trang (`unmount`); bảo toàn câu hỏi/câu trả lời AI và đáp án Quiz đang chọn khi chuyển tab trong cùng bài học.
+    - `[NEW]` `app/mobile.css`: Hệ CSS tách biệt hoàn toàn dưới `.mobile-app-*`, tuân thủ hệ màu nền sáng + 1 màu nhấn xanh lam trầm `#1e5480`, hỗ trợ đủ 4 tổ hợp (Mặc định, **Chữ lớn**, **Tương phản cao** viền `2px solid #0f172a` không bóng đổ, kết hợp cả hai), vòng `:focus-visible` `3px solid #1d4ed8`, tôn trọng `prefers-reduced-motion` và không tràn ngang ở `320px–390px`.
+    - `[MODIFY]` `app/components/learning-app.tsx`: Thêm liên kết gọn `<Link href="/mobile" className="nav-item">` với nhãn `"Mở bản Mobile App"` trên thanh điều hướng `.sidebar`.
+  - **Kiểm chứng:** `npx tsc --noEmit` (`0` lỗi), `npm run lint` (`0` lỗi, `0` cảnh báo), `npm test` (`14` đạt, `0` lỗi, `4` bỏ qua). Chưa kiểm thử trực quan trên trình duyệt/điện thoại/NVDA và chưa chạy `npm run build` (bàn giao `Argon chủ lực` Review & build).
 ---
 
 ## 6. Nhật ký Review & Kiểm chứng (Argon chủ lực)
@@ -626,4 +889,28 @@ export type InsertImageSemanticResponse = {
     1. `npm run lint`: **PASS** (`0` errors, `0` warnings, exit code `0`).
     2. `npx tsc --noEmit`: **PASS** (`0` errors, exit code `0`).
     3. `npm run build`: **PASS** (Next.js 16.3.5 Turbopack biên dịch và đóng gói Production thành công 100%, exit code `0`).
+    4. `npm test`: **PASS** (`14` pass, `0` fail, `4` skipped, exit code `0`).
+- **2026-11-26 (Ticket 6A — Tạo PWA Manifest `app/manifest.ts`, 2 Route Handler Mobile REST API & Hợp đồng bàn giao Ticket 6B):**
+  - Đã tạo `app/manifest.ts` chuẩn Next.js 16 `MetadataRoute.Manifest` cho `"Học Liệu Số - App Khiếm Thị"` (`start_url: "/mobile"`, `display: "standalone"`, `lang: "vi"`, `background_color: "#ffffff"`, `theme_color: "#1e5480"`).
+  - Đã bổ sung các kiểu DTO Mobile (`MobileLessonSummary`, `MobileSectionDetail`, `MobileLessonDetail`, `MobileLessonListResponse`) trong `app/data/content.ts` và các hàm chuyển đổi/hợp nhất cục bộ (`toMobileLessonSummary`, `toMobileLessonDetail`, `toLessonFromMobileSummary`, `toLessonFromMobileDetail`, `mergeMobileLessonsWithLocal`, `resolveMobileLessonDetail`) trong `app/services/content.ts`; giữ mọi trường mở rộng là `optional` để tương thích ngược 100% với `suhoc-content-v2`.
+  - Đã tạo `app/api/mobile/lessons/route.ts` (`GET`) và `app/api/mobile/lessons/[id]/route.ts` (`GET`, `params` kiểu `Promise` theo chuẩn Next.js 16, xác thực đầu vào bằng Zod, đính kèm `Cache-Control: no-store, no-cache, must-revalidate`).
+  - Đã kiểm chứng thực tế: `npx tsc --noEmit` (`0` lỗi), `npm run lint` (`0` lỗi, `0` cảnh báo), `npm test` (`14` pass, `0` fail, `4` skipped) và smoke-test trực tiếp `manifest()` + bộ serializer/semantic search cho các truy vấn giọng nói mẫu (*"Tổng khởi nghĩa tháng Tám"*, *"Cây đa Tân Trào"*, *"Đổi mới"*).
+- **2026-11-26 (Review & Nghiệm thu Ticket 6B — Mobile App Demo Voice-first / Audio-first `/mobile` cho học sinh khiếm thị — `STATUS: PASS`):**
+  - **Phạm vi `git diff` & Bảo mật:**
+    - Đúng phạm vi bàn giao Lượt chạy 6: `app/mobile/page.tsx` (Server Component riêng cho `/mobile` kèm `Metadata`), `app/components/mobile-blind-app.tsx` (`"use client"` Voice-first / Audio-first), `app/mobile.css` (namespace `.mobile-app-*`), `app/components/learning-app.tsx` (thêm liên kết `<Link href="/mobile">` trên `.sidebar`), cùng các file nền tảng Ticket 6A (`app/manifest.ts`, `app/api/mobile/lessons/route.ts`, `app/api/mobile/lessons/[id]/route.ts`, `app/data/content.ts`, `app/services/content.ts`).
+    - Quét toàn bộ `app/`: **0** rò rỉ `OPENROUTER_API_KEY` hay biến môi trường bí mật xuống mã client; mọi truy vấn AI từ `/mobile` đi qua `POST /api/ai-assistant` (`action: "ask_lesson"`) và có fallback cục bộ `askLesson` an toàn khi mất mạng.
+  - **Tương thích ngược `localStorage` & Đồng bộ dữ liệu:**
+    - Giữ nguyên 100% tương thích với `suhoc-content-v2`, `suhoc-lessons-v1`, `suhoc-user-v1` và `suhoc-progress-v1` (`Record<string, Record<string, Progress>>` khớp tuyệt đối với `learning-app.tsx`). Tùy chọn hiển thị Mobile lưu độc lập tại `suhoc-mobile-prefs-v1`.
+    - Hợp nhất chính xác dữ liệu từ `GET /api/mobile/lessons` & `GET /api/mobile/lessons/[id]` (`cache: "no-store"`) với bản giáo viên vừa công bố trong `localStorage` qua `mergeMobileLessonsWithLocal` và `resolveMobileLessonDetail`.
+  - **Tiếp cận người khiếm thị (WCAG 2.2 AA) & Quy chuẩn `AGENTS.md`:**
+    - Không tự động phát âm thanh khi mới tải trang (`autoSpeak: false` ở `loadCatalog`); tự động hủy `speechSynthesis` và dừng `SpeechRecognition` khi bật micro, đổi tab, chuyển bài/mục hoặc `unmount` (không chồng chéo nguồn âm thanh).
+    - Thanh điều hướng đáy 4 màn hình lớn (`min-height: 64px`, `aria-current="page"`), nút Micro trung tâm (`min-height: 104px`, `aria-pressed`), cụm Audio Book Player (`0.8× / 1× / 1.2× / 1.5×`, tạm dừng/tiếp tục/nghe tóm tắt), Hỏi AI phân biệt rõ nhãn `Trợ giảng AI (OpenRouter)` và `Truy hồi đoạn nguồn (Bộ xử lý cục bộ)` kèm nút nhảy về mục nguồn, và Audio Quiz render động theo `question.options.length` (`min-height: 58px`).
+    - Bảo toàn trạng thái `askInput`, `askAnswer`, `quizIndex`, `quizChoices` khi chuyển qua lại giữa các tab trong cùng bài học; hỗ trợ đầy đủ 4 tổ hợp hiển thị (Mặc định, **Chữ lớn**, **Tương phản cao** viền `2px solid #0f172a` không bóng đổ, và kết hợp cả hai) cùng vòng focus `:focus-visible` `3px solid #1d4ed8`.
+  - **Tinh chỉnh tích hợp CSS đã xử lý dứt điểm trong bước Review (`0` lỗi tồn đọng):**
+    1. `app/mobile.css`: Bổ sung `width: 100%; max-width: none; margin: 0; min-height: 0;` cho `.mobile-app-main` và `height: min(calc(100dvh - 40px), 920px)` cho `.mobile-app-shell` ở `@media (min-width: 520px)` nhằm triệt tiêu quy tắc toàn cục `main { margin: auto; min-height: calc(100vh - 92px); }` từ `app/globals.css` (ngăn thanh điều hướng đáy `.mobile-app-bottom-nav` bị đẩy khuất khỏi khung điện thoại trên màn hình máy tính và giữ cuộn mượt bên trong khung); đồng bộ màu `.skip-link` theo `var(--m-accent)`.
+    2. `app/study.css`: Bổ sung `text-decoration: none;` cho `.textbook-app .nav-item` để thẻ `<Link href="/mobile" className="nav-item">` đồng bộ hiển thị không gạch chân giống các nút điều hướng kế bên.
+  - **Kết quả chạy thực tế bộ 4 lệnh kiểm chứng sau khi tinh chỉnh:**
+    1. `npm run lint`: **PASS** (`0` errors, `0` warnings, exit code `0`).
+    2. `npx tsc --noEmit`: **PASS** (`0` errors, exit code `0`).
+    3. `npm run build`: **PASS** (Next.js 16.3.5 Turbopack biên dịch Production thành công 100% các route `/`, `/mobile`, `/manifest.webmanifest`, `/api/mobile/lessons`, `/api/mobile/lessons/[id]`, `/api/ai-assistant`, `/api/import-document`, exit code `0`).
     4. `npm test`: **PASS** (`14` pass, `0` fail, `4` skipped, exit code `0`).
