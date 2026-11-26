@@ -104,6 +104,7 @@ export default function StudyOutline({
                 );
                 return (
                   <button
+                    type="button"
                     key={l.id}
                     className="study-lesson"
                     aria-label={`${lessonLabel(l)}. ${l.id === lesson.id ? "Đang học. " : ""}${contentLabel(l)}${hasVideo(l) && l.sections.length > 0 ? ". Có video" : ""}${itemSummary.label ? `. ${itemSummary.label}` : ""}`}

@@ -13,9 +13,13 @@ export type Block = { id: string; page?: number; filePage?: number } & (
 );
 export type Section = {
   id: string;
+  code?: string; // Ví dụ: "1.1", "1.2", "6.1"
   heading: string;
-  body: string;
+  sourceText?: string; // Nội dung gốc từ SGK (để tham chiếu & làm đầu vào AI)
+  body: string; // Nội dung học (đã chế biến để đọc cho người khiếm thị)
   blocks?: Block[];
+  videoUrl?: string; // Link video bài giảng riêng của mục (URL bất kỳ)
+  keywords?: string[]; // Từ khóa ngữ nghĩa phục vụ Semantic Search
 };
 export type Question = {
   id: string;
@@ -36,6 +40,7 @@ export type Lesson = {
   revision?: number;
   youtubeVideoId?: string;
   youtubeSource?: string;
+  videoUrl?: string;
   transcript?: string;
   subject: string;
   grade: number;
@@ -65,7 +70,7 @@ export type Answer = {
     page?: number;
     excerpt: string;
   }[];
-  mode: "retrieval";
+  mode: "retrieval" | "ai_grounded";
   status: "ok" | "insufficient_evidence";
 };
 export type Draft = { lesson: Lesson; savedAt: string };

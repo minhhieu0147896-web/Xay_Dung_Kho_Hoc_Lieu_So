@@ -65,41 +65,43 @@ export default function CoursePicker({
       className="course-picker"
       aria-label="Chọn môn, lớp và sách giáo khoa"
     >
-      <label>
-        Môn học
-        <select
-          value={value.subject}
-          onChange={(e) => onChange({ ...value, subject: e.target.value })}
-        >
-          {subjects.map((s) => (
-            <option key={s}>{s}</option>
-          ))}
-        </select>
-      </label>
-      <label>
-        Lớp
-        <select
-          value={value.grade}
-          onChange={(e) =>
-            onChange({ ...value, grade: Number(e.target.value) })
-          }
-        >
-          <option value={12}>Lớp 12</option>
-        </select>
-      </label>
-      <label>
-        Sách giáo khoa
-        <select
-          value={value.book}
-          onChange={(e) => onChange({ ...value, book: e.target.value })}
-        >
-          {books.map(([id, title]) => (
-            <option key={id} value={id}>
-              {title}
-            </option>
-          ))}
-        </select>
-      </label>
+      <div className="course-picker-inner">
+        <label>
+          Môn học
+          <select
+            value={value.subject}
+            onChange={(e) => onChange({ ...value, subject: e.target.value })}
+          >
+            {subjects.map((s) => (
+              <option key={s}>{s}</option>
+            ))}
+          </select>
+        </label>
+        <label>
+          Lớp
+          <select
+            value={value.grade}
+            onChange={(e) =>
+              onChange({ ...value, grade: Number(e.target.value) })
+            }
+          >
+            <option value={12}>Lớp 12</option>
+          </select>
+        </label>
+        <label>
+          Sách giáo khoa
+          <select
+            value={value.book}
+            onChange={(e) => onChange({ ...value, book: e.target.value })}
+          >
+            {books.map(([id, title]) => (
+              <option key={id} value={id}>
+                {title}
+              </option>
+            ))}
+          </select>
+        </label>
+      </div>
     </section>
   );
 }

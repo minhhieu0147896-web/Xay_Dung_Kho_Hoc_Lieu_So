@@ -7,6 +7,59 @@ const short = z.string().max(1000);
 export function safeImageUrl(value: string) {
   return /^\/(?!\/)[^\s\\]*$/.test(value) || /^https:\/\/[^\s\\]+$/.test(value);
 }
+export function extractYoutubeId(urlOrId: string): string | null {
+  const value = (urlOrId ?? "").trim();
+  if (!value) return null;
+  if (/^[\w-]{11}$/.test(value)) return value;
+  try {
+    const parsed = new URL(
+      /^https?:\/\//i.test(value) ? value : `https://${value}`,
+    );
+    const host = parsed.hostname.replace(/^www\./i, "").toLowerCase();
+    if (host === "youtu.be") {
+      const candidate = parsed.pathname.split("/").filter(Boolean)[0] ?? "";
+      return /^[\w-]{11}$/.test(candidate) ? candidate : null;
+    }
+    if (
+      host === "youtube.com" ||
+      host === "m.youtube.com" ||
+      host === "music.youtube.com" ||
+      host === "youtube-nocookie.com"
+    ) {
+      const v = parsed.searchParams.get("v") ?? "";
+      if (/^[\w-]{11}$/.test(v)) return v;
+      const parts = parsed.pathname.split("/").filter(Boolean);
+      if (
+        parts.length >= 2 &&
+        ["embed", "shorts", "live", "v"].includes(parts[0]) &&
+        /^[\w-]{11}$/.test(parts[1])
+      ) {
+        return parts[1];
+      }
+    }
+  } catch {
+    // Fallback regex below
+  }
+  const match = value.match(
+    /(?:youtube\.com\/(?:watch\?(?:.*&)?v=|embed\/|shorts\/|live\/|v\/)|youtu\.be\/)([\w-]{11})/i,
+  );
+  return match ? match[1] : null;
+}
+export function renumberSectionCodes(
+  lessonNumber: number | undefined,
+  sections: Section[],
+): Section[] {
+  const prefix =
+    typeof lessonNumber === "number" &&
+    Number.isFinite(lessonNumber) &&
+    lessonNumber > 0
+      ? Math.trunc(lessonNumber)
+      : 1;
+  return sections.map((section, index) => ({
+    ...section,
+    code: `${prefix}.${index + 1}`,
+  }));
+}
 const base = {
   id,
   page: z.number().int().min(1).max(10000).optional(),
@@ -73,15 +126,20 @@ export const lessonSchema = z.object({
     .regex(/^$|^[\w-]{11}$/)
     .optional(),
   youtubeSource: short.optional(),
+  videoUrl: short.optional(),
   transcript: text.optional(),
   sections: z
     .array(
       z.object({
         id,
+        code: short.optional(),
         heading: short,
+        sourceText: text.optional(),
         // Compatibility text is derived from all blocks, so it can exceed a single block.
         body: z.string().default(""),
         blocks: z.array(blockSchema).max(100).optional(),
+        videoUrl: short.optional(),
+        keywords: z.array(short).max(50).optional(),
       }),
     )
     .max(100),
@@ -242,7 +300,10 @@ export function publicationIssues(lesson: Lesson): string[] {
       q.options.some((o) => !o.trim())
     )
       issues.push(`Câu ${q.id}: điền câu hỏi, đáp án và giải thích.`);
-  if (lesson.youtubeVideoId && !lesson.transcript?.trim())
+  if (
+    (lesson.youtubeVideoId || lesson.videoUrl?.trim()) &&
+    !lesson.transcript?.trim()
+  )
     issues.push(
       "Video chưa có bản chép lời và mô tả thông tin trực quan cần thiết.",
     );
@@ -338,6 +399,7 @@ export function appendText(
       return {
         id,
         heading: `Nội dung nhập ${i + 1}${page.page ? ` · trang tệp ${page.page}` : ""}`,
+        sourceText: page.text.trim(),
         body: "",
         blocks,
       };
